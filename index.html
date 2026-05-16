@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 页面头部：显示应用标题 -->
+  <header>
+    <h1>Lily Todo App</h1>
+  </header>
+
+  <!-- 页面主要内容：放置待办事项相关功能 -->
+  <main>
+    <!-- 添加区域：用户在这里输入新的待办事项 -->
+    <section>
+      <h2>添加待办事项</h2>
+
+      <form id="todo-form">
+        <label for="todo-input">待办内容</label>
+        <input type="text" id="todo-input" name="todo" placeholder="请输入待办事项">
+        <button type="submit">添加</button>
+      </form>
+    </section>
+
+    <!-- 列表区域：显示所有待办事项 -->
+    <section>
+      <h2>待办列表</h2>
+
+      <ul id="todo-list">
+        <li>
+          <input type="checkbox" id="todo-1">
+          <label for="todo-1">学习 HTML</label>
+          <button type="button">删除</button>
+        </li>
+        <li>
+          <input type="checkbox" id="todo-2">
+          <label for="todo-2">学习 codex</label>
+          <button type="button">删除</button>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 统计区域：显示待办事项数量信息 -->
+    <section>
+      <h2>统计</h2>
+
+      <p>总数：<span id="total-count">2</span></p>
+      <p>已完成：0</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
