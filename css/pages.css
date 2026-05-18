@@ -23,6 +23,8 @@
 }
 
 .todo-form {
+  display: grid;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
@@ -37,12 +39,35 @@
   gap: 10px;
 }
 
-.todo-form__input {
+.todo-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.todo-form__field {
+  display: grid;
+  gap: 6px;
+}
+
+.todo-form__field-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #3f4c5c;
+}
+
+.todo-form__input,
+.todo-form__select,
+.todo-form__textarea {
   flex: 1;
   min-width: 0;
   padding: 10px 12px;
   border: 1px solid #c8d2de;
   border-radius: 6px;
+}
+
+.todo-form__textarea {
+  resize: vertical;
 }
 
 .todo-form__button,
@@ -63,6 +88,55 @@
   color: #5d6978;
 }
 
+.todo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.todo-controls__field {
+  display: grid;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.todo-controls__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #3f4c5c;
+}
+
+.todo-controls__select {
+  padding: 9px 12px;
+  border: 1px solid #c8d2de;
+  border-radius: 6px;
+  background-color: #ffffff;
+}
+
+.todo-quadrants {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.todo-quadrant-panel {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #d9e0e8;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.todo-quadrant-panel__title {
+  margin: 0;
+  font-size: 16px;
+  color: #1f2933;
+}
+
 .todo-list {
   display: grid;
   gap: 10px;
@@ -73,10 +147,10 @@
 
 .todo-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px;
+  padding: 14px;
   border: 1px solid #d9e0e8;
   border-radius: 8px;
   background-color: #f8fafc;
@@ -84,7 +158,7 @@
 
 .todo-item__main {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   min-width: 0;
 }
@@ -92,13 +166,47 @@
 .todo-item__checkbox {
   width: 18px;
   height: 18px;
+  margin-top: 2px;
+}
+
+.todo-item__content {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.todo-item__quadrant,
+.todo-item__meta,
+.todo-item__note {
+  margin: 0;
+  color: #5d6978;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .todo-item__title {
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.todo-item__note {
+  color: #3f4c5c;
   overflow-wrap: anywhere;
 }
 
 .todo-item.is-completed .todo-item__title {
   color: #6b7280;
   text-decoration: line-through;
+}
+
+@media (max-width: 640px) {
+  .todo-form__row,
+  .todo-form__grid,
+  .todo-quadrants {
+    grid-template-columns: 1fr;
+  }
+
+  .todo-form__row {
+    display: grid;
+  }
 }

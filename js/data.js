@@ -22,7 +22,9 @@ function loadTodos() {
     const parsedTodos = JSON.parse(savedTodos);
 
     if (Array.isArray(parsedTodos)) {
-      return parsedTodos;
+      return parsedTodos.map(function (todo) {
+        return normalizeTodo(todo);
+      });
     }
   } catch (error) {
     return [];
@@ -46,15 +48,61 @@ function getTodos() {
 }
 
 /*
-  createTodo：根据标题创建符合约定结构的 Todo 对象。
+  createTodo：根据输入数据创建符合约定结构的 Todo 对象。
 */
-function createTodo(title) {
+function createTodo(todoData) {
+  const data = normalizeTodoInput(todoData);
+
   return {
     id: createTodoId(),
-    title: title,
+    title: getValueOrDefault(data.title, ""),
     isCompleted: false,
+    quadrant: getValueOrDefault(data.quadrant, 2),
+    dueDate: getValueOrDefault(data.dueDate, ""),
+    note: getValueOrDefault(data.note, ""),
     createdAt: new Date().toISOString()
   };
+}
+
+/*
+  normalizeTodo：把旧版 Todo 数据补齐成当前 schema。
+*/
+function normalizeTodo(todo) {
+  const source = todo || {};
+
+  return {
+    id: source.id === undefined || source.id === null ? createTodoId() : source.id,
+    title: getValueOrDefault(source.title, ""),
+    isCompleted: getValueOrDefault(source.isCompleted, false),
+    quadrant: getValueOrDefault(source.quadrant, 2),
+    dueDate: getValueOrDefault(source.dueDate, ""),
+    note: getValueOrDefault(source.note, ""),
+    createdAt: source.createdAt === undefined || source.createdAt === null ? new Date().toISOString() : source.createdAt
+  };
+}
+
+/*
+  normalizeTodoInput：兼容旧版字符串参数，并统一成对象输入。
+*/
+function normalizeTodoInput(todoData) {
+  if (typeof todoData === "string") {
+    return {
+      title: todoData
+    };
+  }
+
+  return todoData || {};
+}
+
+/*
+  getValueOrDefault：字段缺失或为 null 时使用默认值。
+*/
+function getValueOrDefault(value, defaultValue) {
+  if (value === undefined || value === null) {
+    return defaultValue;
+  }
+
+  return value;
 }
 
 /*
@@ -71,8 +119,8 @@ function createTodoId() {
 /*
   addTodo：把新的 Todo 对象加入 todos 数组，并立即保存。
 */
-function addTodo(title) {
-  todos.push(createTodo(title));
+function addTodo(todoData) {
+  todos.push(createTodo(todoData));
   saveTodos();
 }
 
