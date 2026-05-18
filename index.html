@@ -3,62 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo App</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Lily Todo App V2</title>
+
+  <!-- base.css：放全局基础样式，例如字体、颜色、盒模型 -->
+  <link rel="stylesheet" href="css/base.css">
+
+  <!-- layout.css：放 App Shell 布局样式，例如侧边栏和主内容区域 -->
+  <link rel="stylesheet" href="css/layout.css">
+
+  <!-- components.css：放可复用小组件样式，例如按钮、页面标题 -->
+  <link rel="stylesheet" href="css/components.css">
+
+  <!-- pages.css：放每个页面自己的简单样式 -->
+  <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
-  <!-- 页面头部：显示应用标题 -->
-  <header>
-    <h1>Lily Todo App</h1>
-  </header>
+  <!-- App Shell：应用的外壳，包含左侧导航栏和右侧主内容区域 -->
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <h1>Lily Todo</h1>
+        <p>V2 App Shell</p>
+      </div>
 
-  <!-- 页面主要内容：放置待办事项相关功能 -->
-  <main>
-    <!-- 添加区域：用户在这里输入新的待办事项 -->
-    <section>
-      <h2>添加待办事项</h2>
+      <!-- 左侧导航栏：第一阶段先用按钮切换页面 -->
+      <nav class="sidebar__nav" aria-label="主导航">
+        <button class="nav-button is-active" type="button" data-page="todo">Todo</button>
+        <button class="nav-button" type="button" data-page="calendar">Calendar</button>
+        <button class="nav-button" type="button" data-page="history">History</button>
+        <button class="nav-button" type="button" data-page="settings">Settings</button>
+      </nav>
+    </aside>
 
-      <form id="todo-form">
-        <label for="todo-input">待办内容</label>
-        <input type="text" id="todo-input" name="todo" placeholder="请输入待办事项">
-        <button type="submit">添加</button>
-      </form>
-    </section>
+    <!-- 主内容区域：不同页面的内容会被 JavaScript 渲染到这里 -->
+    <main class="main-content" id="page-content" tabindex="-1"></main>
+  </div>
 
-    <!-- 列表区域：显示所有待办事项 -->
-    <section>
-      <h2>待办列表</h2>
+  <!-- pages.js：保存每个页面要显示的基础内容 -->
+  <script src="js/pages.js"></script>
 
-      <ul id="todo-list">
-        <li>
-          <input type="checkbox" id="todo-1">
-          <label for="todo-1">学习 HTML</label>
-          <button type="button">删除</button>
-        </li>
-        <li>
-          <input type="checkbox" id="todo-2">
-          <label for="todo-2">学习 codex</label>
-          <button type="button">删除</button>
-        </li>
-      </ul>
-    </section>
+  <!-- router.js：负责根据按钮切换当前页面 -->
+  <script src="js/router.js"></script>
 
-    <!-- 历史区域：显示已经完成的待办事项 -->
-    <section>
-      <h2>历史记录</h2>
-
-      <div id="history-list"></div>
-    </section>
-
-    <!-- 统计区域：显示待办事项数量信息 -->
-    <section>
-      <h2>统计</h2>
-
-      <p>待办：<span id="todo-count">2</span></p>
-      <p>已完成：<span id="completed-count">0</span></p>
-    </section>
-  </main>
-
-  <script src="script.js"></script>
+  <!-- app.js：应用入口，负责启动 App Shell -->
+  <script src="js/app.js"></script>
 </body>
 </html>

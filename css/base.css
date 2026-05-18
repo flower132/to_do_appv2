@@ -1,0 +1,35 @@
+/*
+  base.css
+  用途：保存整个应用都需要的基础样式。
+  例如盒模型、字体、页面背景色和默认文字颜色。
+*/
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  color: #1f2933;
+  background-color: #eef2f6;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}

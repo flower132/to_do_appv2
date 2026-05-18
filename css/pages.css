@@ -1,0 +1,23 @@
+/*
+  pages.css
+  用途：保存页面内容区域的简单样式。
+  后续每个页面变复杂时，可以继续在这里补充页面级样式。
+*/
+
+.page-panel {
+  max-width: 860px;
+  padding: 24px;
+  border: 1px solid #d9e0e8;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.placeholder-list {
+  margin: 0;
+  padding-left: 20px;
+  color: #3f4c5c;
+}
+
+.placeholder-list li {
+  margin-bottom: 8px;
+}

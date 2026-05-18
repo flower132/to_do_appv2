@@ -1,0 +1,62 @@
+/*
+  layout.css
+  用途：保存 App Shell 的整体布局样式。
+  这里负责左侧导航栏和右侧主内容区域的位置。
+*/
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  padding: 24px 16px;
+  color: #ffffff;
+  background-color: #243447;
+}
+
+.sidebar__brand {
+  margin-bottom: 28px;
+}
+
+.sidebar__brand h1 {
+  margin-bottom: 4px;
+  font-size: 24px;
+}
+
+.sidebar__brand p {
+  margin-bottom: 0;
+  color: #c8d3df;
+  font-size: 14px;
+}
+
+.sidebar__nav {
+  display: grid;
+  gap: 8px;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  padding: 32px;
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .sidebar__nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+}

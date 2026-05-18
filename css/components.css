@@ -1,0 +1,39 @@
+/*
+  components.css
+  用途：保存可以重复使用的小组件样式。
+  第一阶段只有导航按钮和页面标题。
+*/
+
+.nav-button {
+  width: 100%;
+  padding: 10px 12px;
+  color: #dbe4ee;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background-color: transparent;
+}
+
+.nav-button:hover {
+  color: #ffffff;
+  background-color: #30465d;
+}
+
+.nav-button.is-active {
+  color: #17212f;
+  background-color: #ffffff;
+}
+
+.page-header {
+  margin-bottom: 20px;
+}
+
+.page-header h2 {
+  margin-bottom: 6px;
+  font-size: 28px;
+}
+
+.page-header p {
+  margin-bottom: 0;
+  color: #5d6978;
+}
