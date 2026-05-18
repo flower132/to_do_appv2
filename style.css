@@ -100,6 +100,24 @@ li label {
   font-weight: normal;
 }
 
+/* 已完成的待办事项 */
+li.completed label {
+  color: #666;
+  text-decoration: line-through;
+}
+
+/* 历史记录的日期分组 */
+.history-day {
+  margin-top: 12px;
+}
+
+.history-day > button {
+  width: 100%;
+  text-align: left;
+  font-weight: bold;
+  background-color: #f8f8f8;
+}
+
 /* 小屏幕下让表单换行，避免拥挤 */
 @media (max-width: 480px) {
   form {
