@@ -7,10 +7,19 @@
 const pageContent = document.querySelector("#page-content");
 const navButtons = document.querySelectorAll(".nav-button");
 
+/*
+  renderPage：根据页面名称渲染主内容区域。
+*/
 function renderPage(pageName) {
   const page = pages[pageName];
 
   if (page === undefined) {
+    return;
+  }
+
+  if (pageName === "todo") {
+    todoPage.render();
+    updateActiveNavButton(pageName);
     return;
   }
 
@@ -19,6 +28,9 @@ function renderPage(pageName) {
   updateActiveNavButton(pageName);
 }
 
+/*
+  createPageHtml：创建非 Todo 页面的占位内容 HTML。
+*/
 function createPageHtml(page) {
   const listItems = page.items
     .map(function (item) {
@@ -39,6 +51,9 @@ function createPageHtml(page) {
   );
 }
 
+/*
+  updateActiveNavButton：更新左侧导航按钮的选中状态。
+*/
 function updateActiveNavButton(pageName) {
   for (const button of navButtons) {
     const isCurrentPage = button.dataset.page === pageName;
@@ -46,6 +61,9 @@ function updateActiveNavButton(pageName) {
   }
 }
 
+/*
+  setupNavigation：给左侧导航按钮绑定页面切换事件。
+*/
 function setupNavigation() {
   for (const button of navButtons) {
     button.addEventListener("click", function () {
