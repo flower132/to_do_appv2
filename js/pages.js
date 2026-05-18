@@ -1,7 +1,7 @@
 /*
   pages.js
   用途：保存每个页面的基础信息和 HTML 内容。
-  Todo 页面从第二阶段开始使用数组和对象管理真实数据。
+  Todo 页面负责 UI 渲染和事件绑定，数据逻辑放在 data.js。
 */
 
 const pages = {
@@ -36,12 +36,8 @@ const pages = {
 };
 
 const todoPage = (function () {
-  const state = {
-    todos: []
-  };
-
   /*
-    renderTodoPage：根据 todos 数组重新渲染 Todo 页面。
+    renderTodoPage：根据 data.js 提供的 todos 重新渲染 Todo 页面。
   */
   function renderTodoPage() {
     pageContent.innerHTML = createTodoPageHtml();
@@ -72,14 +68,16 @@ const todoPage = (function () {
   }
 
   /*
-    createTodoListHtml：根据 todos 数组创建列表 HTML。
+    createTodoListHtml：根据 data.js 提供的 todos 创建列表 HTML。
   */
   function createTodoListHtml() {
-    if (state.todos.length === 0) {
+    const todos = getTodos();
+
+    if (todos.length === 0) {
       return '<p class="todo-empty">暂无 Todo，请先新增一条。</p>';
     }
 
-    const todoItems = state.todos
+    const todoItems = todos
       .map(function (todo) {
         return createTodoItemHtml(todo);
       })
@@ -160,60 +158,6 @@ const todoPage = (function () {
 
     deleteTodo(event.target.dataset.id);
     renderTodoPage();
-  }
-
-  /*
-    addTodo：把新的 Todo 对象加入 todos 数组。
-  */
-  function addTodo(title) {
-    state.todos.push(createTodo(title));
-  }
-
-  /*
-    createTodo：根据标题创建符合约定结构的 Todo 对象。
-  */
-  function createTodo(title) {
-    return {
-      id: createTodoId(),
-      title: title,
-      isCompleted: false,
-      createdAt: new Date().toISOString()
-    };
-  }
-
-  /*
-    createTodoId：创建一个字符串 id，优先使用浏览器内置随机 id。
-  */
-  function createTodoId() {
-    if (typeof crypto !== "undefined" && crypto.randomUUID !== undefined) {
-      return crypto.randomUUID();
-    }
-
-    return String(Date.now()) + "-" + String(Math.random());
-  }
-
-  /*
-    toggleTodo：根据 id 切换 Todo 的完成状态。
-  */
-  function toggleTodo(id) {
-    const todo = state.todos.find(function (item) {
-      return item.id === id;
-    });
-
-    if (todo === undefined) {
-      return;
-    }
-
-    todo.isCompleted = !todo.isCompleted;
-  }
-
-  /*
-    deleteTodo：根据 id 从 todos 数组删除 Todo。
-  */
-  function deleteTodo(id) {
-    state.todos = state.todos.filter(function (todo) {
-      return todo.id !== id;
-    });
   }
 
   /*
