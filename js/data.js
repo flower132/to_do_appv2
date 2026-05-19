@@ -57,8 +57,8 @@ function createTodo(todoData) {
     id: createTodoId(),
     title: getValueOrDefault(data.title, ""),
     isCompleted: false,
-    quadrant: getValueOrDefault(data.quadrant, 2),
-    dueDate: getValueOrDefault(data.dueDate, ""),
+    quadrant: normalizeQuadrant(data.quadrant),
+    dueDate: normalizeDueDate(data.dueDate),
     note: getValueOrDefault(data.note, ""),
     createdAt: new Date().toISOString()
   };
@@ -74,8 +74,8 @@ function normalizeTodo(todo) {
     id: source.id === undefined || source.id === null ? createTodoId() : source.id,
     title: getValueOrDefault(source.title, ""),
     isCompleted: getValueOrDefault(source.isCompleted, false),
-    quadrant: getValueOrDefault(source.quadrant, 2),
-    dueDate: getValueOrDefault(source.dueDate, ""),
+    quadrant: normalizeQuadrant(source.quadrant),
+    dueDate: normalizeDueDate(source.dueDate),
     note: getValueOrDefault(source.note, ""),
     createdAt: source.createdAt === undefined || source.createdAt === null ? new Date().toISOString() : source.createdAt
   };
@@ -103,6 +103,36 @@ function getValueOrDefault(value, defaultValue) {
   }
 
   return value;
+}
+
+function normalizeQuadrant(quadrant) {
+  const legacyQuadrants = {
+    1: "urgent-important",
+    2: "important-not-urgent",
+    3: "urgent-not-important",
+    4: "not-urgent-not-important"
+  };
+  const normalizedQuadrant = legacyQuadrants[quadrant] || quadrant;
+  const validQuadrants = [
+    "urgent-important",
+    "important-not-urgent",
+    "urgent-not-important",
+    "not-urgent-not-important"
+  ];
+
+  if (quadrant === undefined || quadrant === null) {
+    return "none";
+  }
+
+  return validQuadrants.includes(normalizedQuadrant) ? normalizedQuadrant : "none";
+}
+
+function normalizeDueDate(dueDate) {
+  if (dueDate === undefined || dueDate === null || dueDate === "") {
+    return null;
+  }
+
+  return dueDate;
 }
 
 /*
@@ -148,4 +178,37 @@ function deleteTodo(id) {
     return todo.id !== id;
   });
   saveTodos();
+}
+
+function computeQuadrant(todo) {
+  const source = todo || {};
+  const dueDate = normalizeDueDate(source.dueDate);
+  const note = getValueOrDefault(source.note, "");
+  const hasDueDate = dueDate !== null;
+  const hasNote = note !== "";
+  const isImportant = source.isImportant === undefined ? hasNote : source.isImportant;
+  const isUrgent = source.isUrgent === undefined ? hasDueDate : source.isUrgent;
+  const today = new Date().toISOString().slice(0, 10);
+
+  if (source.isCompleted === true) {
+    return "DONE";
+  }
+
+  if (hasDueDate && dueDate <= today) {
+    return "urgent-important";
+  }
+
+  if (isUrgent && isImportant) {
+    return "urgent-important";
+  }
+
+  if (isImportant) {
+    return "important-not-urgent";
+  }
+
+  if (isUrgent) {
+    return "urgent-not-important";
+  }
+
+  return "not-urgent-not-important";
 }

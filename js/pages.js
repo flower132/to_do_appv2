@@ -72,10 +72,10 @@ const todoPage = (function () {
             '<label class="todo-form__field" for="todo-quadrant">' +
               '<span class="todo-form__field-label">象限</span>' +
               '<select class="todo-form__select" id="todo-quadrant" name="quadrant">' +
-                '<option value="1">重要且紧急</option>' +
-                '<option value="2" selected>重要不紧急</option>' +
-                '<option value="3">紧急不重要</option>' +
-                '<option value="4">不重要不紧急</option>' +
+                '<option value="urgent-important">重要且紧急</option>' +
+                '<option value="important-not-urgent" selected>重要不紧急</option>' +
+                '<option value="urgent-not-important">紧急不重要</option>' +
+                '<option value="not-urgent-not-important">不重要不紧急</option>' +
               "</select>" +
             "</label>" +
             '<label class="todo-form__field" for="todo-due-date">' +
@@ -123,10 +123,10 @@ const todoPage = (function () {
           '<span class="todo-controls__label">象限</span>' +
           '<select class="todo-controls__select" id="todo-quadrant-view" name="quadrantView">' +
             '<option value="all"' + getSelectedText(viewState.quadrantView, "all") + ">全部</option>" +
-            '<option value="1"' + getSelectedText(viewState.quadrantView, "1") + ">重要且紧急</option>" +
-            '<option value="2"' + getSelectedText(viewState.quadrantView, "2") + ">重要不紧急</option>" +
-            '<option value="3"' + getSelectedText(viewState.quadrantView, "3") + ">紧急不重要</option>" +
-            '<option value="4"' + getSelectedText(viewState.quadrantView, "4") + ">不重要不紧急</option>" +
+            '<option value="urgent-important"' + getSelectedText(viewState.quadrantView, "urgent-important") + ">重要且紧急</option>" +
+            '<option value="important-not-urgent"' + getSelectedText(viewState.quadrantView, "important-not-urgent") + ">重要不紧急</option>" +
+            '<option value="urgent-not-important"' + getSelectedText(viewState.quadrantView, "urgent-not-important") + ">紧急不重要</option>" +
+            '<option value="not-urgent-not-important"' + getSelectedText(viewState.quadrantView, "not-urgent-not-important") + ">不重要不紧急</option>" +
           "</select>" +
         "</label>" +
       "</div>"
@@ -138,7 +138,7 @@ const todoPage = (function () {
   */
   function createQuadrantsHtml() {
     const visibleTodos = getVisibleTodos();
-    const quadrants = viewState.quadrantView === "all" ? [1, 2, 3, 4] : [Number(viewState.quadrantView)];
+    const quadrants = viewState.quadrantView === "all" ? getQuadrantValues() : [viewState.quadrantView];
     const quadrantPanels = quadrants
       .map(function (quadrant) {
         return createQuadrantPanelHtml(quadrant, visibleTodos);
@@ -189,8 +189,11 @@ const todoPage = (function () {
   */
   function getVisibleTodos() {
     const todos = getTodos();
+    const filteredTodos = getFilteredTodos(todos);
+    const searchedTodos = getSearchedTodos(filteredTodos);
+    const quadrantTodos = getQuadrantTodos(searchedTodos);
 
-    return getSortedTodos(getQuadrantTodos(getSearchedTodos(getFilteredTodos(todos))));
+    return getSortedTodos(quadrantTodos);
   }
 
   /*
@@ -231,14 +234,14 @@ const todoPage = (function () {
     getQuadrantTodos：根据 viewState.quadrantView 或指定象限派生象限结果。
   */
   function getQuadrantTodos(todos, quadrant) {
-    const selectedQuadrant = quadrant === undefined ? viewState.quadrantView : String(quadrant);
+    const selectedQuadrant = quadrant === undefined ? viewState.quadrantView : quadrant;
 
     if (selectedQuadrant === "all") {
       return todos.slice();
     }
 
     return todos.filter(function (todo) {
-      return String(todo.quadrant) === selectedQuadrant;
+      return todo.quadrant === selectedQuadrant;
     });
   }
 
@@ -294,7 +297,7 @@ const todoPage = (function () {
   function createTodoItemHtml(todo) {
     const completedClass = todo.isCompleted ? " is-completed" : "";
     const checkedText = todo.isCompleted ? "checked" : "";
-    const dueDateHtml = todo.dueDate === "" ? "" : '<span class="todo-item__meta">截止：' + escapeHtml(todo.dueDate) + "</span>";
+    const dueDateHtml = hasDueDate(todo.dueDate) ? '<span class="todo-item__meta">截止：' + escapeHtml(todo.dueDate) + "</span>" : "";
     const noteHtml = todo.note === "" ? "" : '<span class="todo-item__note">备注：' + escapeHtml(todo.note) + "</span>";
 
     return (
@@ -318,13 +321,13 @@ const todoPage = (function () {
   */
   function getQuadrantLabel(quadrant) {
     const labels = {
-      1: "重要且紧急",
-      2: "重要不紧急",
-      3: "紧急不重要",
-      4: "不重要不紧急"
+      "urgent-important": "重要且紧急",
+      "important-not-urgent": "重要不紧急",
+      "urgent-not-important": "紧急不重要",
+      "not-urgent-not-important": "不重要不紧急"
     };
 
-    return labels[quadrant] || labels[2];
+    return labels[quadrant] || "未分类";
   }
 
   /*
@@ -365,8 +368,8 @@ const todoPage = (function () {
 
     addTodo({
       title: title,
-      quadrant: Number(form.elements.quadrant.value),
-      dueDate: form.elements.dueDate.value,
+      quadrant: form.elements.quadrant.value,
+      dueDate: form.elements.dueDate.value === "" ? null : form.elements.dueDate.value,
       note: form.elements.note.value.trim()
     });
     renderTodoPage();
@@ -432,7 +435,7 @@ const todoPage = (function () {
     escapeHtml：转义用户输入内容，避免标题影响页面结构。
   */
   function escapeHtml(text) {
-    return text
+    return String(text)
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
@@ -460,11 +463,24 @@ const todoPage = (function () {
     getDueDateValue：把截止日期转换成可排序数值，空日期排在最后。
   */
   function getDueDateValue(dueDate) {
-    if (dueDate === "") {
+    if (!hasDueDate(dueDate)) {
       return Number.POSITIVE_INFINITY;
     }
 
     return getTimeValue(dueDate);
+  }
+
+  function hasDueDate(dueDate) {
+    return dueDate !== null && dueDate !== "";
+  }
+
+  function getQuadrantValues() {
+    return [
+      "urgent-important",
+      "important-not-urgent",
+      "urgent-not-important",
+      "not-urgent-not-important"
+    ];
   }
 
   return {
