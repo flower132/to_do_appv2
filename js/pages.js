@@ -11,19 +11,17 @@ const pages = {
   },
   calendar: {
     title: "Calendar",
-    description: "这里将放日历视图。",
-    items: [
-      "后续按日期查看 Todo",
-      "后续显示任务截止日期"
-    ]
+    description: "按截止日期查看 Todo。",
+    get items() {
+      return createCalendarPageItems();
+    }
   },
   history: {
     title: "History",
-    description: "这里将放历史完成记录。",
-    items: [
-      "后续按完成日期分组",
-      "后续查看已经完成的 Todo"
-    ]
+    description: "查看已经完成的 Todo。",
+    get items() {
+      return createHistoryPageItems();
+    }
   },
   settings: {
     title: "Settings",
@@ -34,6 +32,183 @@ const pages = {
     ]
   }
 };
+
+/*
+  getTodosByDate：按 dueDate 分组 Todo，没有 dueDate 的归入 no-date。
+*/
+function getTodosByDate() {
+  const groupsByDate = getTodos().reduce(function (groups, todo) {
+    const dateKey = hasPageDueDate(todo.dueDate) ? todo.dueDate : "no-date";
+
+    if (groups[dateKey] === undefined) {
+      groups[dateKey] = [];
+    }
+
+    groups[dateKey].push(todo);
+    return groups;
+  }, {});
+
+  return Object.keys(groupsByDate)
+    .sort(compareDateGroupKeys)
+    .map(function (dateKey) {
+      return {
+        date: dateKey,
+        todos: groupsByDate[dateKey].slice().sort(comparePageTodosByCreatedAt)
+      };
+    });
+}
+
+/*
+  getCompletedTodos：查询所有已完成 Todo，并按 createdAt 倒序。
+*/
+function getCompletedTodos() {
+  return getTodos()
+    .filter(function (todo) {
+      return todo.isCompleted === true;
+    })
+    .slice()
+    .sort(function (firstTodo, secondTodo) {
+      return comparePageTodosByCreatedAt(secondTodo, firstTodo);
+    });
+}
+
+function createCalendarPageItems() {
+  const groups = getTodosByDate();
+
+  if (groups.length === 0) {
+    return [
+      '<div class="calendar-page">' +
+        '<p class="todo-empty">暂无 Todo。</p>' +
+      "</div>"
+    ];
+  }
+
+  return [
+    '<div class="calendar-page">' +
+      groups.map(createCalendarDateGroupHtml).join("") +
+    "</div>"
+  ];
+}
+
+function createCalendarDateGroupHtml(group) {
+  const dateTitle = group.date === "no-date" ? "无截止日期" : group.date;
+  const countText = group.todos.length + " 项";
+
+  return (
+    '<section class="calendar-day">' +
+      '<header class="calendar-day__header">' +
+        '<h3 class="calendar-day__title">' + escapePageHtml(dateTitle) + "</h3>" +
+        '<span class="calendar-day__count">' + countText + "</span>" +
+      "</header>" +
+      '<ul class="calendar-day__list">' +
+        group.todos.map(createReadonlyTodoItemHtml).join("") +
+      "</ul>" +
+    "</section>"
+  );
+}
+
+function createHistoryPageItems() {
+  const completedTodos = getCompletedTodos();
+
+  if (completedTodos.length === 0) {
+    return [
+      '<div class="history-page">' +
+        '<p class="todo-empty">暂无完成记录。</p>' +
+      "</div>"
+    ];
+  }
+
+  return [
+    '<div class="history-page">' +
+      '<ul class="history-list">' +
+        completedTodos.map(createHistoryTodoItemHtml).join("") +
+      "</ul>" +
+    "</div>"
+  ];
+}
+
+function createHistoryTodoItemHtml(todo) {
+  return createReadonlyTodoItemHtml(todo, "history");
+}
+
+function createReadonlyTodoItemHtml(todo, pageName) {
+  const statusText = todo.isCompleted ? "已完成" : "未完成";
+  const dueDateHtml = hasPageDueDate(todo.dueDate) ? '<span class="readonly-todo__meta">截止：' + escapePageHtml(todo.dueDate) + "</span>" : "";
+  const createdAtHtml = '<span class="readonly-todo__meta">创建：' + escapePageHtml(formatPageDateTime(todo.createdAt)) + "</span>";
+  const noteHtml = todo.note === "" ? "" : '<p class="readonly-todo__note">备注：' + escapePageHtml(todo.note) + "</p>";
+  const itemClass = pageName === "history" ? " readonly-todo--history" : "";
+
+  return (
+    '<li class="readonly-todo' + itemClass + '">' +
+      '<div class="readonly-todo__content">' +
+        '<div class="readonly-todo__topline">' +
+          '<span class="readonly-todo__status">' + statusText + "</span>" +
+          '<span class="readonly-todo__quadrant">' + escapePageHtml(getPageQuadrantLabel(todo.quadrant)) + "</span>" +
+        "</div>" +
+        '<h4 class="readonly-todo__title">' + escapePageHtml(todo.title) + "</h4>" +
+        '<div class="readonly-todo__meta-row">' +
+          dueDateHtml +
+          createdAtHtml +
+        "</div>" +
+        noteHtml +
+      "</div>" +
+    "</li>"
+  );
+}
+
+function compareDateGroupKeys(firstKey, secondKey) {
+  if (firstKey === "no-date") {
+    return 1;
+  }
+
+  if (secondKey === "no-date") {
+    return -1;
+  }
+
+  return firstKey.localeCompare(secondKey);
+}
+
+function comparePageTodosByCreatedAt(firstTodo, secondTodo) {
+  return getPageTimeValue(firstTodo.createdAt) - getPageTimeValue(secondTodo.createdAt);
+}
+
+function getPageTimeValue(dateText) {
+  const timeValue = Date.parse(dateText);
+
+  return Number.isNaN(timeValue) ? 0 : timeValue;
+}
+
+function hasPageDueDate(dueDate) {
+  return dueDate !== null && dueDate !== "";
+}
+
+function formatPageDateTime(dateText) {
+  if (dateText === undefined || dateText === null || dateText === "") {
+    return "未知";
+  }
+
+  return String(dateText).slice(0, 10);
+}
+
+function getPageQuadrantLabel(quadrant) {
+  const labels = {
+    "urgent-important": "重要且紧急",
+    "important-not-urgent": "重要不紧急",
+    "urgent-not-important": "紧急不重要",
+    "not-urgent-not-important": "不重要不紧急"
+  };
+
+  return labels[quadrant] || "未分类";
+}
+
+function escapePageHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
 const todoPage = (function () {
   const viewState = {

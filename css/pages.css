@@ -22,6 +22,118 @@
   margin-bottom: 8px;
 }
 
+.placeholder-list:has(.calendar-page),
+.placeholder-list:has(.history-page) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.placeholder-list:has(.calendar-page) > li,
+.placeholder-list:has(.history-page) > li {
+  margin-bottom: 0;
+}
+
+.calendar-page,
+.history-page {
+  display: grid;
+  gap: 14px;
+}
+
+.calendar-day {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #d9e0e8;
+  border-radius: 8px;
+  background-color: #f8fafc;
+}
+
+.calendar-day__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calendar-day__title {
+  margin: 0;
+  font-size: 16px;
+  color: #1f2933;
+}
+
+.calendar-day__count,
+.readonly-todo__status,
+.readonly-todo__quadrant {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background-color: #e8f0fe;
+  color: #1f4f91;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.calendar-day__list,
+.history-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.readonly-todo {
+  padding: 14px;
+  border: 1px solid #d9e0e8;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.readonly-todo--history {
+  background-color: #f8fafc;
+}
+
+.readonly-todo__content {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.readonly-todo__topline,
+.readonly-todo__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.readonly-todo__quadrant {
+  background-color: #edf7ed;
+  color: #1f6b34;
+}
+
+.readonly-todo__title {
+  margin: 0;
+  color: #1f2933;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.readonly-todo__meta,
+.readonly-todo__note {
+  margin: 0;
+  color: #5d6978;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.readonly-todo__note {
+  color: #3f4c5c;
+  overflow-wrap: anywhere;
+}
+
 .todo-form {
   display: grid;
   gap: 12px;
