@@ -200,7 +200,6 @@ function escapePageHtml(text) {
 
 const todoPage = (function () {
   const viewState = {
-    filter: "all",
     sortBy: "createdAt",
     search: "",
     quadrantView: "all"
@@ -263,14 +262,6 @@ const todoPage = (function () {
   function createTodoControlsHtml() {
     return (
       '<div class="todo-controls">' +
-        '<label class="todo-controls__field" for="todo-filter">' +
-          '<span class="todo-controls__label">筛选</span>' +
-          '<select class="todo-controls__select" id="todo-filter" name="filter">' +
-            '<option value="all"' + getSelectedText(viewState.filter, "all") + ">全部</option>" +
-            '<option value="active"' + getSelectedText(viewState.filter, "active") + ">未完成</option>" +
-            '<option value="completed"' + getSelectedText(viewState.filter, "completed") + ">已完成</option>" +
-          "</select>" +
-        "</label>" +
         '<label class="todo-controls__field" for="todo-sort-by">' +
           '<span class="todo-controls__label">排序</span>' +
           '<select class="todo-controls__select" id="todo-sort-by" name="sortBy">' +
@@ -351,27 +342,11 @@ const todoPage = (function () {
     getVisibleTodos：从数据源经 query layer 派生最终可见 Todo。
   */
   function getVisibleTodos() {
-    const todos = getTodos();
-    const filteredTodos = getFilteredTodos(todos);
-    const searchedTodos = getSearchedTodos(filteredTodos);
+    const todos = getActiveTodos();
+    const searchedTodos = getSearchedTodos(todos);
     const quadrantTodos = getQuadrantTodos(searchedTodos);
 
     return getSortedTodos(quadrantTodos);
-  }
-
-  /*
-    getFilteredTodos：根据 viewState.filter 派生完成状态筛选结果。
-  */
-  function getFilteredTodos(todos) {
-    if (viewState.filter === "active") {
-      return getActiveTodos();
-    }
-
-    if (viewState.filter === "completed") {
-      return getCompletedTodos();
-    }
-
-    return todos.slice();
   }
 
   /*
@@ -494,14 +469,12 @@ const todoPage = (function () {
   */
   function setupTodoPageEvents() {
     const todoForm = document.querySelector("#todo-form");
-    const todoFilter = document.querySelector("#todo-filter");
     const todoSortBy = document.querySelector("#todo-sort-by");
     const todoSearch = document.querySelector("#todo-search");
     const todoQuadrantView = document.querySelector("#todo-quadrant-view");
     const todoLists = document.querySelectorAll(".todo-list");
 
     todoForm.addEventListener("submit", handleTodoSubmit);
-    todoFilter.addEventListener("change", handleTodoFilterChange);
     todoSortBy.addEventListener("change", handleTodoSortChange);
     todoSearch.addEventListener("change", handleTodoSearchChange);
     todoQuadrantView.addEventListener("change", handleTodoQuadrantViewChange);
@@ -531,14 +504,6 @@ const todoPage = (function () {
       dueDate: form.elements.dueDate.value === "" ? null : form.elements.dueDate.value,
       note: form.elements.note.value.trim()
     });
-    renderTodoPage();
-  }
-
-  /*
-    handleTodoFilterChange：更新当前 Todo 筛选条件。
-  */
-  function handleTodoFilterChange(event) {
-    viewState.filter = event.currentTarget.value;
     renderTodoPage();
   }
 
