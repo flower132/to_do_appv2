@@ -58,20 +58,6 @@ function getTodosByDate() {
     });
 }
 
-/*
-  getCompletedTodos：查询所有已完成 Todo，并按 createdAt 倒序。
-*/
-function getCompletedTodos() {
-  return getTodos()
-    .filter(function (todo) {
-      return todo.isCompleted === true;
-    })
-    .slice()
-    .sort(function (firstTodo, secondTodo) {
-      return comparePageTodosByCreatedAt(secondTodo, firstTodo);
-    });
-}
-
 function createCalendarPageItems() {
   const groups = getTodosByDate();
 
@@ -108,7 +94,9 @@ function createCalendarDateGroupHtml(group) {
 }
 
 function createHistoryPageItems() {
-  const completedTodos = getCompletedTodos();
+  const completedTodos = getCompletedTodos().sort(function (firstTodo, secondTodo) {
+    return comparePageTodosByCreatedAt(secondTodo, firstTodo);
+  });
 
   if (completedTodos.length === 0) {
     return [
@@ -376,15 +364,11 @@ const todoPage = (function () {
   */
   function getFilteredTodos(todos) {
     if (viewState.filter === "active") {
-      return todos.filter(function (todo) {
-        return !todo.isCompleted;
-      });
+      return getActiveTodos();
     }
 
     if (viewState.filter === "completed") {
-      return todos.filter(function (todo) {
-        return todo.isCompleted;
-      });
+      return getCompletedTodos();
     }
 
     return todos.slice();

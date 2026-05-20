@@ -48,6 +48,24 @@ function getTodos() {
 }
 
 /*
+  getActiveTodos：返回所有未完成的 Todo（isCompleted === false），不修改原数组。
+*/
+function getActiveTodos() {
+  return todos.filter(function (todo) {
+    return todo.isCompleted === false;
+  });
+}
+
+/*
+  getCompletedTodos：返回所有已完成的 Todo（isCompleted === true），不修改原数组。
+*/
+function getCompletedTodos() {
+  return todos.filter(function (todo) {
+    return todo.isCompleted === true;
+  });
+}
+
+/*
   createTodo：根据输入数据创建符合约定结构的 Todo 对象。
 */
 function createTodo(todoData) {
