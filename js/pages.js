@@ -660,7 +660,10 @@ const historyPage = (function () {
           "</div>" +
           noteHtml +
         "</div>" +
-        '<button class="history-item__restore" type="button" data-action="restore" data-id="' + todo.id + '">恢复</button>' +
+        '<div class="history-item__actions">' +
+          '<button class="history-item__restore" type="button" data-action="restore" data-id="' + todo.id + '">恢复</button>' +
+          '<button class="history-item__delete" type="button" data-action="delete" data-id="' + todo.id + '">永久删除</button>' +
+        "</div>" +
       "</li>"
     );
   }
@@ -676,12 +679,19 @@ const historyPage = (function () {
   }
 
   function handleHistoryClick(event) {
-    if (event.target.dataset.action !== "restore") {
+    var action = event.target.dataset.action;
+
+    if (action === "restore") {
+      restoreTodo(event.target.dataset.id);
+      renderHistoryPage();
       return;
     }
 
-    restoreTodo(event.target.dataset.id);
-    renderHistoryPage();
+    if (action === "delete") {
+      deleteTodo(event.target.dataset.id);
+      renderHistoryPage();
+      return;
+    }
   }
 
   return {

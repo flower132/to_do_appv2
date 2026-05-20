@@ -390,6 +390,27 @@
   background-color: #1f6feb;
 }
 
+.history-item__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.history-item__delete {
+  padding: 6px 12px;
+  color: #d1242f;
+  border: 1px solid #d1242f;
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.history-item__delete:hover {
+  color: #ffffff;
+  background-color: #d1242f;
+}
+
 .history-empty {
   margin-bottom: 0;
   color: #5d6978;
