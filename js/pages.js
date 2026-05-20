@@ -11,10 +11,7 @@ const pages = {
   },
   calendar: {
     title: "Calendar",
-    description: "按截止日期查看 Todo。",
-    get items() {
-      return createCalendarPageItems();
-    }
+    description: "按截止日期查看 Todo。"
   },
   history: {
     title: "History",
@@ -29,107 +26,6 @@ const pages = {
     ]
   }
 };
-
-/*
-  getTodosByDate：按 dueDate 分组 Todo，没有 dueDate 的归入 no-date。
-*/
-function getTodosByDate() {
-  const groupsByDate = getTodos().reduce(function (groups, todo) {
-    const dateKey = hasPageDueDate(todo.dueDate) ? todo.dueDate : "no-date";
-
-    if (groups[dateKey] === undefined) {
-      groups[dateKey] = [];
-    }
-
-    groups[dateKey].push(todo);
-    return groups;
-  }, {});
-
-  return Object.keys(groupsByDate)
-    .sort(compareDateGroupKeys)
-    .map(function (dateKey) {
-      return {
-        date: dateKey,
-        todos: groupsByDate[dateKey].slice().sort(comparePageTodosByCreatedAt)
-      };
-    });
-}
-
-function createCalendarPageItems() {
-  const groups = getTodosByDate();
-
-  if (groups.length === 0) {
-    return [
-      '<div class="calendar-page">' +
-        '<p class="todo-empty">暂无 Todo。</p>' +
-      "</div>"
-    ];
-  }
-
-  return [
-    '<div class="calendar-page">' +
-      groups.map(createCalendarDateGroupHtml).join("") +
-    "</div>"
-  ];
-}
-
-function createCalendarDateGroupHtml(group) {
-  const dateTitle = group.date === "no-date" ? "无截止日期" : group.date;
-  const countText = group.todos.length + " 项";
-
-  return (
-    '<section class="calendar-day">' +
-      '<header class="calendar-day__header">' +
-        '<h3 class="calendar-day__title">' + escapePageHtml(dateTitle) + "</h3>" +
-        '<span class="calendar-day__count">' + countText + "</span>" +
-      "</header>" +
-      '<ul class="calendar-day__list">' +
-        group.todos.map(createReadonlyTodoItemHtml).join("") +
-      "</ul>" +
-    "</section>"
-  );
-}
-
-function createReadonlyTodoItemHtml(todo, pageName) {
-  const statusText = todo.isCompleted ? "已完成" : "未完成";
-  const dueDateHtml = hasPageDueDate(todo.dueDate) ? '<span class="readonly-todo__meta">截止：' + escapePageHtml(todo.dueDate) + "</span>" : "";
-  const createdAtHtml = '<span class="readonly-todo__meta">创建：' + escapePageHtml(formatPageDateTime(todo.createdAt)) + "</span>";
-  const noteHtml = todo.note === "" ? "" : '<p class="readonly-todo__note">备注：' + escapePageHtml(todo.note) + "</p>";
-  const itemClass = pageName === "history" ? " readonly-todo--history" : "";
-
-  return (
-    '<li class="readonly-todo' + itemClass + '">' +
-      '<div class="readonly-todo__content">' +
-        '<div class="readonly-todo__topline">' +
-          '<span class="readonly-todo__status">' + statusText + "</span>" +
-          '<span class="readonly-todo__quadrant">' + escapePageHtml(getPageQuadrantLabel(todo.quadrant)) + "</span>" +
-        "</div>" +
-        '<h4 class="readonly-todo__title">' + escapePageHtml(todo.title) + "</h4>" +
-        '<div class="readonly-todo__meta-row">' +
-          dueDateHtml +
-          createdAtHtml +
-        "</div>" +
-        noteHtml +
-      "</div>" +
-    "</li>"
-  );
-}
-
-function compareDateGroupKeys(firstKey, secondKey) {
-  if (firstKey === "no-date") {
-    return 1;
-  }
-
-  if (secondKey === "no-date") {
-    return -1;
-  }
-
-  return firstKey.localeCompare(secondKey);
-}
-
-function comparePageTodosByCreatedAt(firstTodo, secondTodo) {
-  return getPageTimeValue(firstTodo.createdAt) - getPageTimeValue(secondTodo.createdAt);
-}
 
 function getPageTimeValue(dateText) {
   const timeValue = Date.parse(dateText);
@@ -168,6 +64,185 @@ function escapePageHtml(text) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+const calendarPage = (function () {
+  const calendarState = {
+    year: new Date().getFullYear(),
+    month: new Date().getMonth()
+  };
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  /*
+    renderCalendarPage：渲染 Calendar 页面。
+  */
+  function renderCalendarPage() {
+    pageContent.innerHTML = createCalendarPageHtml();
+    setupCalendarPageEvents();
+    pageContent.focus();
+  }
+
+  /*
+    createCalendarPageHtml：创建 Calendar 页面完整 HTML 字符串。
+  */
+  function createCalendarPageHtml() {
+    return (
+      '<section class="page-panel">' +
+        '<header class="page-header">' +
+          "<h2>" + pages.calendar.title + "</h2>" +
+          "<p>" + pages.calendar.description + "</p>" +
+        "</header>" +
+        createCalendarWidgetHtml() +
+      "</section>"
+    );
+  }
+
+  /*
+    createCalendarWidgetHtml：创建月份网格日历组件 HTML。
+  */
+  function createCalendarWidgetHtml() {
+    const year = calendarState.year;
+    const month = calendarState.month;
+
+    return (
+      '<div class="calendar-widget">' +
+        createCalendarNavHtml(year, month) +
+        createWeekdayHeaderHtml() +
+        createCalendarGridHtml(year, month) +
+      "</div>"
+    );
+  }
+
+  /*
+    createCalendarNavHtml：创建日历标题和月份导航按钮。
+  */
+  function createCalendarNavHtml(year, month) {
+    const title = monthNames[month] + " " + year;
+
+    return (
+      '<div class="calendar-nav">' +
+        '<button class="calendar-nav__button" type="button" data-action="prev-month">&lt;</button>' +
+        '<span class="calendar-nav__title">' + escapePageHtml(title) + "</span>" +
+        '<button class="calendar-nav__button" type="button" data-action="next-month">&gt;</button>' +
+      "</div>"
+    );
+  }
+
+  /*
+    createWeekdayHeaderHtml：创建星期标题行。
+  */
+  function createWeekdayHeaderHtml() {
+    const cells = weekdayNames.map(function (name) {
+      return '<div class="calendar-weekday">' + escapePageHtml(name) + "</div>";
+    }).join("");
+
+    return '<div class="calendar-weekdays">' + cells + "</div>";
+  }
+
+  /*
+    createCalendarGridHtml：创建日期网格，包含空白补齐和日期 cell。
+  */
+  function createCalendarGridHtml(year, month) {
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDayOfWeek = getFirstDayOfWeek(year, month);
+    const cells = [];
+
+    for (var i = 0; i < firstDayOfWeek; i++) {
+      cells.push('<div class="calendar-cell calendar-cell--empty"></div>');
+    }
+
+    for (var day = 1; day <= daysInMonth; day++) {
+      cells.push(
+        '<div class="calendar-cell">' +
+          '<span class="calendar-cell__number">' + day + "</span>" +
+        "</div>"
+      );
+    }
+
+    return '<div class="calendar-grid">' + cells.join("") + "</div>";
+  }
+
+  /*
+    getDaysInMonth：返回指定月份的天数。
+  */
+  function getDaysInMonth(year, month) {
+    return new Date(year, month + 1, 0).getDate();
+  }
+
+  /*
+    getFirstDayOfWeek：返回指定月份第一天是星期几（0=Sun）。
+  */
+  function getFirstDayOfWeek(year, month) {
+    return new Date(year, month, 1).getDay();
+  }
+
+  /*
+    setupCalendarPageEvents：绑定日历导航按钮事件。
+  */
+  function setupCalendarPageEvents() {
+    var widget = pageContent.querySelector(".calendar-widget");
+
+    if (widget === null) {
+      return;
+    }
+
+    widget.addEventListener("click", handleCalendarClick);
+  }
+
+  /*
+    handleCalendarClick：处理日历内按钮点击。
+  */
+  function handleCalendarClick(event) {
+    var action = event.target.dataset.action;
+
+    if (action === "prev-month") {
+      goToPrevMonth();
+      return;
+    }
+
+    if (action === "next-month") {
+      goToNextMonth();
+      return;
+    }
+  }
+
+  /*
+    goToPrevMonth：切换到上一个月并重新渲染。
+  */
+  function goToPrevMonth() {
+    calendarState.month -= 1;
+
+    if (calendarState.month < 0) {
+      calendarState.month = 11;
+      calendarState.year -= 1;
+    }
+
+    renderCalendarPage();
+  }
+
+  /*
+    goToNextMonth：切换到下一个月并重新渲染。
+  */
+  function goToNextMonth() {
+    calendarState.month += 1;
+
+    if (calendarState.month > 11) {
+      calendarState.month = 0;
+      calendarState.year += 1;
+    }
+
+    renderCalendarPage();
+  }
+
+  return {
+    render: renderCalendarPage
+  };
+}());
 
 const todoPage = (function () {
   const viewState = {
