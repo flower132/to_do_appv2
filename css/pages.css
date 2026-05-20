@@ -311,6 +311,75 @@
   text-decoration: line-through;
 }
 
+.history-item {
+  padding: 14px;
+  border: 1px solid #d9e0e8;
+  border-radius: 8px;
+  background-color: #f8fafc;
+}
+
+.history-item__content {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.history-item__topline,
+.history-item__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.history-item__status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background-color: #e8f0fe;
+  color: #1f4f91;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.history-item__quadrant {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background-color: #edf7ed;
+  color: #1f6b34;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.history-item__title {
+  margin: 0;
+  color: #1f2933;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.history-item__meta {
+  color: #5d6978;
+  font-size: 14px;
+}
+
+.history-item__note {
+  margin: 0;
+  color: #3f4c5c;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.history-empty {
+  margin-bottom: 0;
+  color: #5d6978;
+}
+
 @media (max-width: 640px) {
   .todo-form__row,
   .todo-form__grid,

@@ -23,6 +23,12 @@ function renderPage(pageName) {
     return;
   }
 
+  if (pageName === "history") {
+    historyPage.render();
+    updateActiveNavButton(pageName);
+    return;
+  }
+
   pageContent.innerHTML = createPageHtml(page);
   pageContent.focus();
   updateActiveNavButton(pageName);

@@ -18,10 +18,7 @@ const pages = {
   },
   history: {
     title: "History",
-    description: "查看已经完成的 Todo。",
-    get items() {
-      return createHistoryPageItems();
-    }
+    description: "查看已经完成的 Todo。"
   },
   settings: {
     title: "Settings",
@@ -91,32 +88,6 @@ function createCalendarDateGroupHtml(group) {
       "</ul>" +
     "</section>"
   );
-}
-
-function createHistoryPageItems() {
-  const completedTodos = getCompletedTodos().sort(function (firstTodo, secondTodo) {
-    return comparePageTodosByCreatedAt(secondTodo, firstTodo);
-  });
-
-  if (completedTodos.length === 0) {
-    return [
-      '<div class="history-page">' +
-        '<p class="todo-empty">暂无完成记录。</p>' +
-      "</div>"
-    ];
-  }
-
-  return [
-    '<div class="history-page">' +
-      '<ul class="history-list">' +
-        completedTodos.map(createHistoryTodoItemHtml).join("") +
-      "</ul>" +
-    "</div>"
-  ];
-}
-
-function createHistoryTodoItemHtml(todo) {
-  return createReadonlyTodoItemHtml(todo, "history");
 }
 
 function createReadonlyTodoItemHtml(todo, pageName) {
@@ -609,5 +580,90 @@ const todoPage = (function () {
 
   return {
     render: renderTodoPage
+  };
+}());
+
+const historyPage = (function () {
+  /*
+    renderHistoryPage：根据 data.js 提供的已完成 todos 渲染 History 页面。
+  */
+  function renderHistoryPage() {
+    pageContent.innerHTML = createHistoryPageHtml();
+    pageContent.focus();
+  }
+
+  /*
+    createHistoryPageHtml：创建 History 页面完整 HTML 字符串。
+  */
+  function createHistoryPageHtml() {
+    var completedTodos = getCompletedTodos().sort(function (firstTodo, secondTodo) {
+      return getPageTimeValue(secondTodo.createdAt) - getPageTimeValue(firstTodo.createdAt);
+    });
+
+    return (
+      '<section class="page-panel">' +
+        '<header class="page-header">' +
+          "<h2>" + pages.history.title + "</h2>" +
+          "<p>" + pages.history.description + "</p>" +
+        "</header>" +
+        createHistoryContentHtml(completedTodos) +
+      "</section>"
+    );
+  }
+
+  /*
+    createHistoryContentHtml：根据已完成 todos 创建列表或空状态 HTML。
+  */
+  function createHistoryContentHtml(completedTodos) {
+    if (completedTodos.length === 0) {
+      return (
+        '<div class="history-page">' +
+          '<p class="history-empty">暂无完成记录。</p>' +
+        "</div>"
+      );
+    }
+
+    return (
+      '<div class="history-page">' +
+        '<ul class="history-list">' +
+          completedTodos.map(createHistoryItemHtml).join("") +
+        "</ul>" +
+      "</div>"
+    );
+  }
+
+  /*
+    createHistoryItemHtml：为单个已完成的 Todo 创建列表项 HTML。
+  */
+  function createHistoryItemHtml(todo) {
+    var quadrantLabel = getPageQuadrantLabel(todo.quadrant);
+    var dueDateHtml = hasPageDueDate(todo.dueDate)
+      ? '<span class="history-item__meta">截止：' + escapePageHtml(todo.dueDate) + "</span>"
+      : "";
+    var completedAtHtml = '<span class="history-item__meta">创建：' + escapePageHtml(formatPageDateTime(todo.createdAt)) + "</span>";
+    var noteHtml = todo.note === ""
+      ? ""
+      : '<p class="history-item__note">备注：' + escapePageHtml(todo.note) + "</p>";
+
+    return (
+      '<li class="history-item">' +
+        '<div class="history-item__content">' +
+          '<div class="history-item__topline">' +
+            '<span class="history-item__status">已完成</span>' +
+            '<span class="history-item__quadrant">' + escapePageHtml(quadrantLabel) + "</span>" +
+          "</div>" +
+          '<h3 class="history-item__title">' + escapePageHtml(todo.title) + "</h3>" +
+          '<div class="history-item__meta-row">' +
+            dueDateHtml +
+            completedAtHtml +
+          "</div>" +
+          noteHtml +
+        "</div>" +
+      "</li>"
+    );
+  }
+
+  return {
+    render: renderHistoryPage
   };
 }());
