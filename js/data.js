@@ -189,6 +189,22 @@ function toggleTodo(id) {
 }
 
 /*
+  restoreTodo：将已完成 Todo 恢复为未完成状态，并立即保存。
+*/
+function restoreTodo(id) {
+  const todo = todos.find(function (item) {
+    return item.id === id;
+  });
+
+  if (todo === undefined) {
+    return;
+  }
+
+  todo.isCompleted = false;
+  saveTodos();
+}
+
+/*
   deleteTodo：根据 id 从 todos 数组删除 Todo，并立即保存。
 */
 function deleteTodo(id) {

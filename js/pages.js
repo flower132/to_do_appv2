@@ -589,6 +589,7 @@ const historyPage = (function () {
   */
   function renderHistoryPage() {
     pageContent.innerHTML = createHistoryPageHtml();
+    setupHistoryPageEvents();
     pageContent.focus();
   }
 
@@ -659,8 +660,28 @@ const historyPage = (function () {
           "</div>" +
           noteHtml +
         "</div>" +
+        '<button class="history-item__restore" type="button" data-action="restore" data-id="' + todo.id + '">恢复</button>' +
       "</li>"
     );
+  }
+
+  function setupHistoryPageEvents() {
+    var historyList = document.querySelector(".history-list");
+
+    if (historyList === null) {
+      return;
+    }
+
+    historyList.addEventListener("click", handleHistoryClick);
+  }
+
+  function handleHistoryClick(event) {
+    if (event.target.dataset.action !== "restore") {
+      return;
+    }
+
+    restoreTodo(event.target.dataset.id);
+    renderHistoryPage();
   }
 
   return {

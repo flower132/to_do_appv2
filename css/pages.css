@@ -375,6 +375,21 @@
   overflow-wrap: anywhere;
 }
 
+.history-item__restore {
+  padding: 6px 12px;
+  color: #1f6feb;
+  border: 1px solid #1f6feb;
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.history-item__restore:hover {
+  color: #ffffff;
+  background-color: #1f6feb;
+}
+
 .history-empty {
   margin-bottom: 0;
   color: #5d6978;
