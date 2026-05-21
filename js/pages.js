@@ -19,11 +19,8 @@ const pages = {
   },
   settings: {
     title: "Settings",
-    description: "这里将放应用设置。",
-    items: [
-      "后续支持基础偏好设置",
-      "后续支持清空或重置数据"
-    ]
+    description: "Manage app preferences.",
+    items: []
   }
 };
 
@@ -46,14 +43,7 @@ function formatPageDateTime(dateText) {
 }
 
 function getPageQuadrantLabel(quadrant) {
-  const labels = {
-    "urgent-important": "重要且紧急",
-    "important-not-urgent": "重要不紧急",
-    "urgent-not-important": "紧急不重要",
-    "not-urgent-not-important": "不重要不紧急"
-  };
-
-  return labels[quadrant] || "未分类";
+  return t("quadrant." + quadrant) || t("quadrant.none");
 }
 
 function escapePageHtml(text) {
@@ -99,8 +89,8 @@ const calendarPage = (function () {
     return (
       '<section class="page-panel">' +
         '<header class="page-header">' +
-          "<h2>" + pages.calendar.title + "</h2>" +
-          "<p>" + pages.calendar.description + "</p>" +
+          "<h2>" + t("page.calendar") + "</h2>" +
+          "<p>" + t("page.calendar.desc") + "</p>" +
         "</header>" +
         createCalendarWidgetHtml() +
         createSelectedDatePanelHtml() +
@@ -222,7 +212,7 @@ const calendarPage = (function () {
     }).join("");
 
     var moreHtml = remaining > 0
-      ? '<div class="calendar-cell__more">+' + remaining + " more</div>"
+      ? '<div class="calendar-cell__more">+' + remaining + " " + t("calendar.more") + "</div>"
       : "";
 
     return '<div class="calendar-cell__todos">' + itemsHtml + moreHtml + "</div>";
@@ -240,7 +230,7 @@ const calendarPage = (function () {
     return (
       '<div class="calendar-selected-panel">' +
         '<h3 class="calendar-selected-panel__title">' +
-          (selectedDate !== null ? escapePageHtml(selectedDate) : "选择日期查看 Todo") +
+          (selectedDate !== null ? escapePageHtml(selectedDate) : t("calendar.selectDate")) +
         "</h3>" +
         panelHtml +
       "</div>"
@@ -249,7 +239,7 @@ const calendarPage = (function () {
 
   function createSelectedDateTodosHtml(todos, date) {
     if (todos.length === 0) {
-      return '<p class="calendar-selected-panel__empty">该日期没有 Todo。</p>';
+      return '<p class="calendar-selected-panel__empty">' + t("calendar.noTodos") + '</p>';
     }
 
     var visibleIds = todos.map(function (todo) { return todo.id; });
@@ -259,12 +249,12 @@ const calendarPage = (function () {
 
     var bulkActionsHtml =
       '<div class="calendar-bulk-actions">' +
-        '<button class="calendar-bulk-actions__button" type="button" data-action="toggle-select-all">' + (allSelected ? "取消全选" : "全选") + '</button>';
+        '<button class="calendar-bulk-actions__button" type="button" data-action="toggle-select-all">' + (allSelected ? t("todo.deselectAll") : t("todo.selectAll")) + '</button>';
 
     if (calendarViewState.selectedTodos.length > 0) {
       bulkActionsHtml +=
-        '<button class="calendar-bulk-actions__button calendar-bulk-actions__button--complete" type="button" data-action="bulk-complete">批量完成 (' + calendarViewState.selectedTodos.length + ')</button>' +
-        '<button class="calendar-bulk-actions__button calendar-bulk-actions__button--delete" type="button" data-action="bulk-delete">批量删除 (' + calendarViewState.selectedTodos.length + ')</button>';
+        '<button class="calendar-bulk-actions__button calendar-bulk-actions__button--complete" type="button" data-action="bulk-complete">' + t("todo.bulkComplete") + ' (' + calendarViewState.selectedTodos.length + ')</button>' +
+        '<button class="calendar-bulk-actions__button calendar-bulk-actions__button--delete" type="button" data-action="bulk-delete">' + t("todo.bulkDelete") + ' (' + calendarViewState.selectedTodos.length + ')</button>';
     }
 
     bulkActionsHtml += "</div>";
@@ -279,11 +269,11 @@ const calendarPage = (function () {
             '<li class="calendar-selected-panel__item">' +
               '<input class="calendar-selected-panel__select" type="checkbox" data-action="select" data-id="' + todo.id + '"' + isSelected + '>' +
               '<span class="calendar-selected-panel__todo-title' + overdueClass + '">' + escapePageHtml(todo.title) + "</span>" +
-              '<span class="calendar-selected-panel__quadrant">' + escapePageHtml(getPageQuadrantLabel(todo.quadrant)) + "</span>" +
-              '<span class="calendar-selected-panel__due-date">' + escapePageHtml(todo.dueDate || "无截止日期") + "</span>" +
+              '<span class="calendar-selected-panel__quadrant">' + escapePageHtml(t("quadrant." + todo.quadrant)) + "</span>" +
+              '<span class="calendar-selected-panel__due-date">' + escapePageHtml(todo.dueDate || t("todo.noDueDate")) + "</span>" +
               '<span class="calendar-selected-panel__actions">' +
-                '<button class="calendar-selected-panel__complete" type="button" data-action="complete" data-id="' + todo.id + '">完成</button>' +
-                '<button class="calendar-selected-panel__delete" type="button" data-action="delete" data-id="' + todo.id + '">删除</button>' +
+                '<button class="calendar-selected-panel__complete" type="button" data-action="complete" data-id="' + todo.id + '">' + t("todo.completed") + '</button>' +
+                '<button class="calendar-selected-panel__delete" type="button" data-action="delete" data-id="' + todo.id + '">' + t("todo.delete") + '</button>' +
               "</span>" +
             "</li>"
           );
@@ -486,37 +476,37 @@ const todoPage = (function () {
     return (
       '<section class="page-panel">' +
         '<header class="page-header">' +
-          "<h2>" + pages.todo.title + "</h2>" +
-          "<p>" + pages.todo.description + "</p>" +
+          "<h2>" + t("page.todo") + "</h2>" +
+          "<p>" + t("page.todo.desc") + "</p>" +
         "</header>" +
         '<form class="todo-form" id="todo-form">' +
-          '<label class="todo-form__label" for="todo-title">新 Todo</label>' +
+          '<label class="todo-form__label" for="todo-title">' + t("todo.new") + '</label>' +
           '<div class="todo-form__row">' +
-            '<input class="todo-form__input" id="todo-title" name="title" type="text" placeholder="输入待办事项" autocomplete="off">' +
-            '<button class="todo-form__button" type="submit">新增</button>' +
+            '<input class="todo-form__input" id="todo-title" name="title" type="text" placeholder="' + t("todo.placeholder") + '" autocomplete="off">' +
+            '<button class="todo-form__button" type="submit">' + t("todo.add") + '</button>' +
           "</div>" +
           '<div class="todo-form__grid">' +
             '<label class="todo-form__field" for="todo-quadrant">' +
-              '<span class="todo-form__field-label">象限</span>' +
+              '<span class="todo-form__field-label">' + t("todo.quadrant") + '</span>' +
               '<select class="todo-form__select" id="todo-quadrant" name="quadrant">' +
-                '<option value="urgent-important">重要且紧急</option>' +
-                '<option value="important-not-urgent" selected>重要不紧急</option>' +
-                '<option value="urgent-not-important">紧急不重要</option>' +
-                '<option value="not-urgent-not-important">不重要不紧急</option>' +
+                '<option value="urgent-important">' + t("quadrant.urgent-important") + '</option>' +
+                '<option value="important-not-urgent" selected>' + t("quadrant.important-not-urgent") + '</option>' +
+                '<option value="urgent-not-important">' + t("quadrant.urgent-not-important") + '</option>' +
+                '<option value="not-urgent-not-important">' + t("quadrant.not-urgent-not-important") + '</option>' +
               "</select>" +
             "</label>" +
             '<label class="todo-form__field" for="todo-start-date">' +
-              '<span class="todo-form__field-label">开始日期</span>' +
+              '<span class="todo-form__field-label">' + t("todo.startDate") + '</span>' +
               '<input class="todo-form__input" id="todo-start-date" name="startDate" type="date">' +
             "</label>" +
             '<label class="todo-form__field" for="todo-due-date">' +
-              '<span class="todo-form__field-label">截止日期</span>' +
+              '<span class="todo-form__field-label">' + t("todo.dueDate") + '</span>' +
               '<input class="todo-form__input" id="todo-due-date" name="dueDate" type="date">' +
             "</label>" +
           "</div>" +
           '<label class="todo-form__field" for="todo-note">' +
-            '<span class="todo-form__field-label">备注</span>' +
-            '<textarea class="todo-form__textarea" id="todo-note" name="note" rows="3" placeholder="补充说明"></textarea>' +
+            '<span class="todo-form__field-label">' + t("todo.note") + '</span>' +
+            '<textarea class="todo-form__textarea" id="todo-note" name="note" rows="3" placeholder="' + t("todo.note.placeholder") + '"></textarea>' +
           "</label>" +
         "</form>" +
         createTodoControlsHtml() +
@@ -533,24 +523,24 @@ const todoPage = (function () {
     return (
       '<div class="todo-controls">' +
         '<label class="todo-controls__field" for="todo-sort-by">' +
-          '<span class="todo-controls__label">排序</span>' +
+          '<span class="todo-controls__label">' + t("todo.sort") + '</span>' +
           '<select class="todo-controls__select" id="todo-sort-by" name="sortBy">' +
-            '<option value="createdAt"' + getSelectedText(viewState.sortBy, "createdAt") + ">创建时间</option>" +
-            '<option value="dueDate"' + getSelectedText(viewState.sortBy, "dueDate") + ">截止日期</option>" +
+            '<option value="createdAt"' + getSelectedText(viewState.sortBy, "createdAt") + ">" + t("todo.sort.createdAt") + "</option>" +
+            '<option value="dueDate"' + getSelectedText(viewState.sortBy, "dueDate") + ">" + t("todo.sort.dueDate") + "</option>" +
           "</select>" +
         "</label>" +
         '<label class="todo-controls__field" for="todo-search">' +
-          '<span class="todo-controls__label">搜索</span>' +
-          '<input class="todo-controls__select" id="todo-search" name="search" type="search" value="' + escapeHtml(viewState.search) + '" placeholder="搜索 Todo">' +
+          '<span class="todo-controls__label">' + t("todo.search") + '</span>' +
+          '<input class="todo-controls__select" id="todo-search" name="search" type="search" value="' + escapeHtml(viewState.search) + '" placeholder="' + t("todo.search.placeholder") + '">' +
         "</label>" +
         '<label class="todo-controls__field" for="todo-quadrant-view">' +
-          '<span class="todo-controls__label">象限</span>' +
+          '<span class="todo-controls__label">' + t("todo.quadrant") + '</span>' +
           '<select class="todo-controls__select" id="todo-quadrant-view" name="quadrantView">' +
-            '<option value="all"' + getSelectedText(viewState.quadrantView, "all") + ">全部</option>" +
-            '<option value="urgent-important"' + getSelectedText(viewState.quadrantView, "urgent-important") + ">重要且紧急</option>" +
-            '<option value="important-not-urgent"' + getSelectedText(viewState.quadrantView, "important-not-urgent") + ">重要不紧急</option>" +
-            '<option value="urgent-not-important"' + getSelectedText(viewState.quadrantView, "urgent-not-important") + ">紧急不重要</option>" +
-            '<option value="not-urgent-not-important"' + getSelectedText(viewState.quadrantView, "not-urgent-not-important") + ">不重要不紧急</option>" +
+            '<option value="all"' + getSelectedText(viewState.quadrantView, "all") + ">" + t("todo.quadrant.all") + "</option>" +
+            '<option value="urgent-important"' + getSelectedText(viewState.quadrantView, "urgent-important") + ">" + t("quadrant.urgent-important") + "</option>" +
+            '<option value="important-not-urgent"' + getSelectedText(viewState.quadrantView, "important-not-urgent") + ">" + t("quadrant.important-not-urgent") + "</option>" +
+            '<option value="urgent-not-important"' + getSelectedText(viewState.quadrantView, "urgent-not-important") + ">" + t("quadrant.urgent-not-important") + "</option>" +
+            '<option value="not-urgent-not-important"' + getSelectedText(viewState.quadrantView, "not-urgent-not-important") + ">" + t("quadrant.not-urgent-not-important") + "</option>" +
           "</select>" +
         "</label>" +
       "</div>"
@@ -574,13 +564,13 @@ const todoPage = (function () {
       return viewState.selectedTodos.includes(id);
     });
 
-    var selectAllHtml = '<button class="todo-bulk-actions__button" type="button" data-action="toggle-select-all">' + (allSelected ? "取消全选" : "全选") + "</button>";
+    var selectAllHtml = '<button class="todo-bulk-actions__button" type="button" data-action="toggle-select-all">' + (allSelected ? t("todo.deselectAll") : t("todo.selectAll")) + "</button>";
     var bulkHtml = "";
 
     if (viewState.selectedTodos.length > 0) {
       bulkHtml =
-        '<button class="todo-bulk-actions__button todo-bulk-actions__button--complete" type="button" data-action="bulk-complete">批量完成 (' + viewState.selectedTodos.length + ')</button>' +
-        '<button class="todo-bulk-actions__button todo-bulk-actions__button--delete" type="button" data-action="bulk-delete">批量删除 (' + viewState.selectedTodos.length + ')</button>';
+        '<button class="todo-bulk-actions__button todo-bulk-actions__button--complete" type="button" data-action="bulk-complete">' + t("todo.bulkComplete") + ' (' + viewState.selectedTodos.length + ')</button>' +
+        '<button class="todo-bulk-actions__button todo-bulk-actions__button--delete" type="button" data-action="bulk-delete">' + t("todo.bulkDelete") + ' (' + viewState.selectedTodos.length + ')</button>';
     }
 
     return '<div class="todo-bulk-actions">' + selectAllHtml + bulkHtml + "</div>";
@@ -609,7 +599,7 @@ const todoPage = (function () {
 
     return (
       '<section class="todo-quadrant-panel">' +
-        '<h3 class="todo-quadrant-panel__title">' + escapeHtml(getQuadrantLabel(quadrant)) + "</h3>" +
+        '<h3 class="todo-quadrant-panel__title">' + escapeHtml(t("quadrant." + quadrant)) + "</h3>" +
         createTodoListHtml(todos) +
       "</section>"
     );
@@ -620,7 +610,7 @@ const todoPage = (function () {
   */
   function createTodoListHtml(todos) {
     if (todos.length === 0) {
-      return '<p class="todo-empty">暂无 Todo。</p>';
+      return '<p class="todo-empty">' + t("todo.empty") + '</p>';
     }
 
     return '<ul class="todo-list">' + createTodoItemsHtml(todos) + "</ul>";
@@ -729,8 +719,8 @@ const todoPage = (function () {
     数据源已通过 getActiveTodos() 过滤，因此不需要处理 completed 状态。
   */
   function createTodoItemHtml(todo) {
-    const dueDateHtml = hasDueDate(todo.dueDate) ? '<span class="todo-item__meta">截止：' + escapeHtml(todo.dueDate) + "</span>" : "";
-    const noteHtml = todo.note === "" ? "" : '<span class="todo-item__note">备注：' + escapeHtml(todo.note) + "</span>";
+    const dueDateHtml = hasDueDate(todo.dueDate) ? '<span class="todo-item__meta">' + t("todo.dueDate") + "：" + escapeHtml(todo.dueDate) + "</span>" : "";
+    const noteHtml = todo.note === "" ? "" : '<span class="todo-item__note">' + t("todo.note") + "：" + escapeHtml(todo.note) + "</span>";
     const isSelected = viewState.selectedTodos.includes(todo.id) ? " checked" : "";
 
     return (
@@ -739,13 +729,13 @@ const todoPage = (function () {
         '<label class="todo-item__main">' +
           '<input class="todo-item__checkbox" type="checkbox" data-action="toggle" data-id="' + todo.id + '">' +
           '<span class="todo-item__content">' +
-            '<span class="todo-item__quadrant">[' + escapeHtml(getQuadrantLabel(todo.quadrant)) + "]</span>" +
+            '<span class="todo-item__quadrant">[' + escapeHtml(t("quadrant." + todo.quadrant)) + "]</span>" +
             '<span class="todo-item__title">' + escapeHtml(todo.title) + "</span>" +
             dueDateHtml +
             noteHtml +
           "</span>" +
         "</label>" +
-        '<button class="todo-item__delete" type="button" data-action="delete" data-id="' + todo.id + '">删除</button>' +
+        '<button class="todo-item__delete" type="button" data-action="delete" data-id="' + todo.id + '">' + t("todo.delete") + '</button>' +
       "</li>"
     );
   }
@@ -754,14 +744,7 @@ const todoPage = (function () {
     getQuadrantLabel：把 Todo 象限值转换成展示文本。
   */
   function getQuadrantLabel(quadrant) {
-    const labels = {
-      "urgent-important": "重要且紧急",
-      "important-not-urgent": "重要不紧急",
-      "urgent-not-important": "紧急不重要",
-      "not-urgent-not-important": "不重要不紧急"
-    };
-
-    return labels[quadrant] || "未分类";
+    return t("quadrant." + quadrant) || t("quadrant.none");
   }
 
   /*
@@ -1005,8 +988,8 @@ const historyPage = (function () {
     return (
       '<section class="page-panel">' +
         '<header class="page-header">' +
-          "<h2>" + pages.history.title + "</h2>" +
-          "<p>" + pages.history.description + "</p>" +
+          "<h2>" + t("page.history") + "</h2>" +
+          "<p>" + t("page.history.desc") + "</p>" +
         "</header>" +
         createHistoryContentHtml(completedTodos) +
       "</section>"
@@ -1020,7 +1003,7 @@ const historyPage = (function () {
     if (completedTodos.length === 0) {
       return (
         '<div class="history-page">' +
-          '<p class="history-empty">暂无完成记录。</p>' +
+          '<p class="history-empty">' + t("todo.noHistory") + '</p>' +
         "</div>"
       );
     }
@@ -1032,11 +1015,11 @@ const historyPage = (function () {
 
     var bulkActionsHtml =
       '<div class="history-bulk-actions">' +
-        '<button class="history-bulk-actions__button" type="button" data-action="toggle-select-all">' + (allSelected ? "取消全选" : "全选") + '</button>';
+        '<button class="history-bulk-actions__button" type="button" data-action="toggle-select-all">' + (allSelected ? t("todo.deselectAll") : t("todo.selectAll")) + '</button>';
 
     if (historyViewState.selectedTodos.length > 0) {
       bulkActionsHtml +=
-        '<button class="history-bulk-actions__button history-bulk-actions__button--delete" type="button" data-action="bulk-delete">批量删除 (' + historyViewState.selectedTodos.length + ')</button>';
+        '<button class="history-bulk-actions__button history-bulk-actions__button--delete" type="button" data-action="bulk-delete">' + t("todo.bulkDelete") + ' (' + historyViewState.selectedTodos.length + ')</button>';
     }
 
     bulkActionsHtml += "</div>";
@@ -1055,14 +1038,14 @@ const historyPage = (function () {
     createHistoryItemHtml：为单个已完成的 Todo 创建列表项 HTML。
   */
   function createHistoryItemHtml(todo) {
-    var quadrantLabel = getPageQuadrantLabel(todo.quadrant);
+    var quadrantLabel = t("quadrant." + todo.quadrant);
     var dueDateHtml = hasPageDueDate(todo.dueDate)
-      ? '<span class="history-item__meta">截止：' + escapePageHtml(todo.dueDate) + "</span>"
+      ? '<span class="history-item__meta">' + t("todo.dueDate") + "：" + escapePageHtml(todo.dueDate) + "</span>"
       : "";
-    var completedAtHtml = '<span class="history-item__meta">创建：' + escapePageHtml(formatPageDateTime(todo.createdAt)) + "</span>";
+    var completedAtHtml = '<span class="history-item__meta">' + t("todo.sort.createdAt") + "：" + escapePageHtml(formatPageDateTime(todo.createdAt)) + "</span>";
     var noteHtml = todo.note === ""
       ? ""
-      : '<p class="history-item__note">备注：' + escapePageHtml(todo.note) + "</p>";
+      : '<p class="history-item__note">' + t("todo.note") + "：" + escapePageHtml(todo.note) + "</p>";
     var isSelected = historyViewState.selectedTodos.includes(todo.id) ? " checked" : "";
 
     return (
@@ -1071,7 +1054,7 @@ const historyPage = (function () {
         '<div class="history-item__body">' +
           '<div class="history-item__content">' +
             '<div class="history-item__topline">' +
-              '<span class="history-item__status">已完成</span>' +
+              '<span class="history-item__status">' + t("todo.completed") + "</span>" +
               '<span class="history-item__quadrant">' + escapePageHtml(quadrantLabel) + "</span>" +
             "</div>" +
             '<h3 class="history-item__title">' + escapePageHtml(todo.title) + "</h3>" +
@@ -1082,8 +1065,8 @@ const historyPage = (function () {
             noteHtml +
           "</div>" +
           '<div class="history-item__actions">' +
-            '<button class="history-item__restore" type="button" data-action="restore" data-id="' + todo.id + '">恢复</button>' +
-            '<button class="history-item__delete" type="button" data-action="delete" data-id="' + todo.id + '">永久删除</button>' +
+            '<button class="history-item__restore" type="button" data-action="restore" data-id="' + todo.id + '">' + t("todo.restore") + "</button>" +
+            '<button class="history-item__delete" type="button" data-action="delete" data-id="' + todo.id + '">' + t("todo.permanentDelete") + "</button>" +
           "</div>" +
         "</div>" +
       "</li>"
@@ -1176,5 +1159,222 @@ const historyPage = (function () {
 
   return {
     render: renderHistoryPage
+  };
+}());
+
+const settingsPage = (function () {
+  /*
+    renderSettingsPage：渲染 Settings 页面。
+  */
+  function renderSettingsPage() {
+    pageContent.innerHTML = createSettingsPageHtml();
+    setupSettingsPageEvents();
+    pageContent.focus();
+  }
+
+  /*
+    createSettingsPageHtml：创建 Settings 页面完整 HTML。
+  */
+  function createSettingsPageHtml() {
+    var s = getSettings();
+
+    return (
+      '<section class="page-panel">' +
+        '<header class="page-header">' +
+          "<h2>" + t("page.settings") + "</h2>" +
+          "<p>" + t("page.settings.desc") + "</p>" +
+        "</header>" +
+        createAppearanceSectionHtml(s) +
+        createLanguageSectionHtml(s) +
+        createBehaviorSectionHtml(s) +
+        createDataSectionHtml(s) +
+      "</section>"
+    );
+  }
+
+  function createAppearanceSectionHtml(s) {
+    var themeOptions = [
+      { value: "light", label: t("settings.theme.light") },
+      { value: "dark", label: t("settings.theme.dark") },
+      { value: "system", label: t("settings.theme.system") }
+    ];
+    var fontSizeOptions = [
+      { value: "small", label: t("settings.fontSize.small") },
+      { value: "medium", label: t("settings.fontSize.medium") },
+      { value: "large", label: t("settings.fontSize.large") }
+    ];
+
+    return (
+      '<div class="settings-section">' +
+        '<h3 class="settings-section__title">' + t("settings.appearance") + "</h3>" +
+        '<div class="settings-card">' +
+          createSettingsRowSelectHtml(t("settings.theme"), "appearance.theme", themeOptions, s.appearance.theme) +
+          createSettingsRowSelectHtml(t("settings.fontSize"), "appearance.fontSize", fontSizeOptions, s.appearance.fontSize) +
+          createSettingsRowSwitchHtml(t("settings.compactMode"), "appearance.compactMode", s.appearance.compactMode) +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function createLanguageSectionHtml(s) {
+    var localeOptions = [
+      { value: "zh-CN", label: t("settings.locale.zh") },
+      { value: "en", label: t("settings.locale.en") }
+    ];
+
+    return (
+      '<div class="settings-section">' +
+        '<h3 class="settings-section__title">' + t("settings.language") + "</h3>" +
+        '<div class="settings-card">' +
+          createSettingsRowSelectHtml(t("settings.locale"), "language.locale", localeOptions, s.language.locale) +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function createBehaviorSectionHtml(s) {
+    var pageOptions = [
+      { value: "todo", label: t("settings.defaultPage.todo") },
+      { value: "calendar", label: t("settings.defaultPage.calendar") },
+      { value: "history", label: t("settings.defaultPage.history") }
+    ];
+
+    return (
+      '<div class="settings-section">' +
+        '<h3 class="settings-section__title">' + t("settings.behavior") + "</h3>" +
+        '<div class="settings-card">' +
+          createSettingsRowSelectHtml(t("settings.defaultPage"), "behavior.defaultPage", pageOptions, s.behavior.defaultPage) +
+          createSettingsRowSwitchHtml(t("settings.showCompletedLabel"), "behavior.showCompletedLabel", s.behavior.showCompletedLabel) +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function createDataSectionHtml(s) {
+    return (
+      '<div class="settings-section">' +
+        '<h3 class="settings-section__title">' + t("settings.data") + "</h3>" +
+        '<div class="settings-card">' +
+          '<div class="settings-row">' +
+            '<span class="settings-row__label">' + t("settings.export") + "</span>" +
+            '<button class="settings-button" type="button" data-action="export">' + t("settings.export") + "</button>" +
+          "</div>" +
+          '<div class="settings-row">' +
+            '<span class="settings-row__label">' + t("settings.import") + "</span>" +
+            '<input class="settings-file" type="file" accept="application/json" data-action="import">' +
+          "</div>" +
+          '<div class="settings-row">' +
+            '<span class="settings-row__label">' + t("settings.clear") + "</span>" +
+            '<button class="settings-button settings-button--danger" type="button" data-action="clear">' + t("settings.clear") + "</button>" +
+          "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function createSettingsRowSelectHtml(label, path, options, currentValue) {
+    var optionsHtml = options.map(function (opt) {
+      var selected = opt.value === currentValue ? " selected" : "";
+      return '<option value="' + opt.value + '"' + selected + ">" + opt.label + "</option>";
+    }).join("");
+
+    return (
+      '<div class="settings-row">' +
+        '<span class="settings-row__label">' + label + "</span>" +
+        '<select class="settings-select" data-path="' + path + '">' +
+          optionsHtml +
+        "</select>" +
+      "</div>"
+    );
+  }
+
+  function createSettingsRowSwitchHtml(label, path, checked) {
+    var checkedAttr = checked ? " checked" : "";
+    return (
+      '<div class="settings-row">' +
+        '<span class="settings-row__label">' + label + "</span>" +
+        '<label class="settings-switch">' +
+          '<input type="checkbox" data-path="' + path + '"' + checkedAttr + ">" +
+          '<span class="settings-switch__slider"></span>' +
+        "</label>" +
+      "</div>"
+    );
+  }
+
+  /*
+    setupSettingsPageEvents：绑定设置页面事件。
+  */
+  function setupSettingsPageEvents() {
+    var selects = pageContent.querySelectorAll(".settings-select[data-path]");
+    var switches = pageContent.querySelectorAll(".settings-switch input[data-path]");
+    var buttons = pageContent.querySelectorAll(".settings-button[data-action]");
+    var fileInput = pageContent.querySelector(".settings-file[data-action='import']");
+
+    selects.forEach(function (select) {
+      select.addEventListener("change", handleSettingChange);
+    });
+
+    switches.forEach(function (sw) {
+      sw.addEventListener("change", handleSettingChange);
+    });
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", handleSettingsButtonClick);
+    });
+
+    if (fileInput !== null) {
+      fileInput.addEventListener("change", handleImportFile);
+    }
+  }
+
+  function handleSettingChange(event) {
+    var target = event.currentTarget;
+    var path = target.dataset.path;
+    var value = target.type === "checkbox" ? target.checked : target.value;
+    updateSetting(path, value);
+
+    if (path.indexOf("appearance") === 0) {
+      applySettingsToDOM();
+    }
+
+    if (path.indexOf("language.locale") === 0) {
+      renderSettingsPage();
+    }
+  }
+
+  function handleSettingsButtonClick(event) {
+    var action = event.currentTarget.dataset.action;
+
+    if (action === "export") {
+      exportData();
+      return;
+    }
+
+    if (action === "clear") {
+      clearAllData();
+      return;
+    }
+  }
+
+  function handleImportFile(event) {
+    var file = event.currentTarget.files[0];
+    if (file === undefined) {
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var success = importData(e.target.result);
+      if (success) {
+        window.alert("Import successful.");
+      } else {
+        window.alert("Import failed. Please check the file format.");
+      }
+      event.currentTarget.value = "";
+    };
+    reader.readAsText(file);
+  }
+
+  return {
+    render: renderSettingsPage
   };
 }());

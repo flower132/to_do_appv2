@@ -797,3 +797,147 @@
   color: #ffffff;
   background-color: #d1242f;
 }
+
+/* Settings page styles */
+.settings-section {
+  margin-bottom: 24px;
+}
+
+.settings-section__title {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #5d6978;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.settings-card {
+  background-color: #ffffff;
+  border: 1px solid #d9e0e8;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row__label {
+  font-size: 15px;
+  color: #1f2933;
+}
+
+.settings-select {
+  padding: 8px 12px;
+  border: 1px solid #c8d2de;
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #1f2933;
+  min-width: 120px;
+}
+
+.settings-button {
+  padding: 8px 14px;
+  border: 1px solid #1f6feb;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #1f6feb;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.settings-button:hover {
+  color: #ffffff;
+  background-color: #1f6feb;
+}
+
+.settings-button--danger {
+  border-color: #d1242f;
+  color: #d1242f;
+}
+
+.settings-button--danger:hover {
+  color: #ffffff;
+  background-color: #d1242f;
+}
+
+.settings-file {
+  font-size: 14px;
+  color: #1f2933;
+}
+
+/* Switch toggle */
+.settings-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.settings-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-switch__slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  border-radius: 24px;
+  transition: background-color 200ms ease;
+}
+
+.settings-switch__slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: transform 200ms ease;
+}
+
+.settings-switch input:checked + .settings-switch__slider {
+  background-color: #1f6feb;
+}
+
+.settings-switch input:checked + .settings-switch__slider::before {
+  transform: translateX(20px);
+}
+
+/* Dark mode overrides for settings */
+html[data-theme="dark"] .settings-select {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .settings-file {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .settings-row__label {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .settings-section__title {
+  color: #94a3b8;
+}

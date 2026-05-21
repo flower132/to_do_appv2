@@ -5,11 +5,28 @@
 */
 
 /*
-  startApp：初始化导航，并渲染默认 Todo 页面。
+  startApp：加载设置、应用到 DOM、初始化导航，并渲染默认页面。
 */
 function startApp() {
+  applySettingsToDOM();
   setupNavigation();
-  renderPage("todo");
+  setupSystemThemeListener();
+  renderPage(getSettings().behavior.defaultPage);
+}
+
+/*
+  setupSystemThemeListener：当主题为“跟随系统”时，监听系统主题变化。
+*/
+function setupSystemThemeListener() {
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  if (!media || !media.addEventListener) {
+    return;
+  }
+  media.addEventListener("change", function () {
+    if (getSettings().appearance.theme === "system") {
+      document.documentElement.dataset.theme = getEffectiveTheme();
+    }
+  });
 }
 
 startApp();

@@ -1,0 +1,43 @@
+{
+    "version": "1.0",
+    "description": "Lily Todo App V2 skill activation rules",
+    "skills": {
+        "todo-app-dev": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Lily Todo App V2 vanilla JS development guidelines. App Shell architecture, page routing, localStorage data management, CSS layering.",
+            "promptTriggers": {
+                "keywords": [
+                    "todo", "calendar", "history", "settings",
+                    "page", "sidebar", "navigation", "router",
+                    "localStorage", "app shell", "lily todo",
+                    "data.js", "pages.js", "router.js", "app.js",
+                    "页面", "侧边栏", "导航", "日历", "设置",
+                    "样式", "css", "路由", "数据", "存储",
+                    "切换", "按钮", "组件", "布局"
+                ],
+                "intentPatterns": [
+                    "(add|create|build|implement|make|添加|创建|新建|增加|加一个|做一个).*?(page|component|button|nav|sidebar|页面|组件|按钮|导航|侧边栏)",
+                    "(fix|debug|update|modify|change|edit|修复|修改|改一下|调整|更新|优化).*?(page|component|style|css|js|页面|样式|组件|功能)",
+                    "(add|create|implement|添加|创建).*?(route|router|navigation|路由|切换)",
+                    "(save|store|persist|load|保存|存储|读取|持久化).*?(data|todo|local|数据)",
+                    "(how to|best practice|convention|怎么|如何|规范).*?(todo|app|project|项目)",
+                    "(帮|请|让|给).*?(加|改|做|写|实现).*?(页面|组件|按钮|功能|样式|路由|导航|日历|todo|数据|侧边栏)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "js/**/*.js",
+                    "css/**/*.css",
+                    "index.html"
+                ],
+                "pathExclusions": [
+                    "node_modules/**",
+                    ".git/**"
+                ],
+                "contentPatterns": []
+            }
+        }
+    }
+}

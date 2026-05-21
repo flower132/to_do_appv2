@@ -16,6 +16,160 @@ body {
   background-color: #eef2f6;
 }
 
+/* 字体大小 */
+html[data-font-size="small"] {
+  font-size: 14px;
+}
+
+html[data-font-size="medium"] {
+  font-size: 16px;
+}
+
+html[data-font-size="large"] {
+  font-size: 18px;
+}
+
+/* 深色模式 */
+html[data-theme="dark"] body {
+  color: #e2e8f0;
+  background-color: #0f172a;
+}
+
+html[data-theme="dark"] .page-panel {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .todo-form__input,
+html[data-theme="dark"] .todo-form__select,
+html[data-theme="dark"] .todo-form__textarea,
+html[data-theme="dark"] .todo-controls__select,
+html[data-theme="dark"] .settings-select,
+html[data-theme="dark"] .calendar-nav__button {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .todo-item {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .todo-quadrant-panel {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .history-item {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .calendar-cell {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .calendar-cell:hover {
+  background-color: #27354f;
+}
+
+html[data-theme="dark"] .calendar-selected-panel {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .calendar-selected-panel__item {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .calendar-selected-panel__item:hover {
+  background-color: #27354f;
+}
+
+html[data-theme="dark"] .settings-card {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .settings-row {
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .page-header p {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .todo-item__quadrant,
+html[data-theme="dark"] .todo-item__meta,
+html[data-theme="dark"] .todo-item__note {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .history-item__meta,
+html[data-theme="dark"] .history-item__note {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .calendar-cell__todo {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .calendar-cell__number {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .todo-empty,
+html[data-theme="dark"] .history-empty,
+html[data-theme="dark"] .calendar-selected-panel__empty {
+  color: #94a3b8;
+}
+
+/* 紧凑模式 */
+html[data-compact="true"] .todo-list {
+  gap: 6px;
+}
+
+html[data-compact="true"] .todo-item {
+  padding: 8px 10px;
+}
+
+html[data-compact="true"] .history-list {
+  gap: 6px;
+}
+
+html[data-compact="true"] .history-item {
+  padding: 8px 10px;
+}
+
+html[data-compact="true"] .calendar-grid {
+  gap: 5px;
+}
+
+html[data-compact="true"] .calendar-cell {
+  padding: 8px;
+  min-height: 60px;
+}
+
+html[data-compact="true"] .todo-quadrants {
+  gap: 8px;
+}
+
+html[data-compact="true"] .todo-quadrant-panel {
+  padding: 10px;
+  gap: 8px;
+}
+
+html[data-compact="true"] .calendar-selected-panel__list {
+  gap: 8px;
+}
+
+html[data-compact="true"] .calendar-selected-panel__item {
+  padding: 8px;
+}
+
 button,
 input,
 textarea,

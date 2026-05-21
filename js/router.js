@@ -35,6 +35,12 @@ function renderPage(pageName) {
     return;
   }
 
+  if (pageName === "settings") {
+    settingsPage.render();
+    updateActiveNavButton(pageName);
+    return;
+  }
+
   pageContent.innerHTML = createPageHtml(page);
   pageContent.focus();
   updateActiveNavButton(pageName);
