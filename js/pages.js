@@ -71,6 +71,10 @@ const calendarPage = (function () {
     month: new Date().getMonth()
   };
 
+  const calendarViewState = {
+    selectedDate: null
+  };
+
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -98,6 +102,7 @@ const calendarPage = (function () {
           "<p>" + pages.calendar.description + "</p>" +
         "</header>" +
         createCalendarWidgetHtml() +
+        createSelectedDatePanelHtml() +
       "</section>"
     );
   }
@@ -157,14 +162,95 @@ const calendarPage = (function () {
     }
 
     for (var day = 1; day <= daysInMonth; day++) {
+      var dateString = formatCalendarDate(year, month, day);
+      var dayTodos = getTodosByDate(dateString);
+      var todosHtml = createCalendarCellTodosHtml(dayTodos);
+      var isSelected = dateString === calendarViewState.selectedDate;
+      var selectedClass = isSelected ? " is-selected" : "";
+
       cells.push(
-        '<div class="calendar-cell">' +
+        '<div class="calendar-cell' + selectedClass + '" data-date="' + dateString + '">' +
           '<span class="calendar-cell__number">' + day + "</span>" +
+          todosHtml +
         "</div>"
       );
     }
 
     return '<div class="calendar-grid">' + cells.join("") + "</div>";
+  }
+
+  function formatCalendarDate(year, month, day) {
+    var monthStr = String(month + 1);
+    var dayStr = String(day);
+
+    if (monthStr.length < 2) {
+      monthStr = "0" + monthStr;
+    }
+
+    if (dayStr.length < 2) {
+      dayStr = "0" + dayStr;
+    }
+
+    return year + "-" + monthStr + "-" + dayStr;
+  }
+
+  function createCalendarCellTodosHtml(todos) {
+    if (todos.length === 0) {
+      return "";
+    }
+
+    var maxVisible = 2;
+    var visibleTodos = todos.slice(0, maxVisible);
+    var remaining = todos.length - maxVisible;
+
+    var itemsHtml = visibleTodos.map(function (todo) {
+      return '<div class="calendar-cell__todo">' + escapePageHtml(todo.title) + "</div>";
+    }).join("");
+
+    var moreHtml = remaining > 0
+      ? '<div class="calendar-cell__more">+' + remaining + " more</div>"
+      : "";
+
+    return '<div class="calendar-cell__todos">' + itemsHtml + moreHtml + "</div>";
+  }
+
+  function createSelectedDatePanelHtml() {
+    var selectedDate = calendarViewState.selectedDate;
+    var panelHtml = "";
+
+    if (selectedDate !== null) {
+      var selectedTodos = getTodosByDate(selectedDate);
+      panelHtml = createSelectedDateTodosHtml(selectedTodos, selectedDate);
+    }
+
+    return (
+      '<div class="calendar-selected-panel">' +
+        '<h3 class="calendar-selected-panel__title">' +
+          (selectedDate !== null ? escapePageHtml(selectedDate) : "选择日期查看 Todo") +
+        "</h3>" +
+        panelHtml +
+      "</div>"
+    );
+  }
+
+  function createSelectedDateTodosHtml(todos, date) {
+    if (todos.length === 0) {
+      return '<p class="calendar-selected-panel__empty">该日期没有 Todo。</p>';
+    }
+
+    return (
+      '<ul class="calendar-selected-panel__list">' +
+        todos.map(function (todo) {
+          return (
+            '<li class="calendar-selected-panel__item">' +
+              '<span class="calendar-selected-panel__todo-title">' + escapePageHtml(todo.title) + "</span>" +
+              '<span class="calendar-selected-panel__quadrant">' + escapePageHtml(getPageQuadrantLabel(todo.quadrant)) + "</span>" +
+              '<span class="calendar-selected-panel__due-date">' + escapePageHtml(todo.dueDate || "无截止日期") + "</span>" +
+            "</li>"
+          );
+        }).join("") +
+      "</ul>"
+    );
   }
 
   /*
@@ -199,6 +285,8 @@ const calendarPage = (function () {
   */
   function handleCalendarClick(event) {
     var action = event.target.dataset.action;
+    var cell = event.target.closest(".calendar-cell");
+    var date = cell !== null ? cell.dataset.date : undefined;
 
     if (action === "prev-month") {
       goToPrevMonth();
@@ -207,6 +295,12 @@ const calendarPage = (function () {
 
     if (action === "next-month") {
       goToNextMonth();
+      return;
+    }
+
+    if (date !== undefined && date !== "") {
+      calendarViewState.selectedDate = date;
+      renderCalendarPage();
       return;
     }
   }

@@ -66,6 +66,15 @@ function getCompletedTodos() {
 }
 
 /*
+  getTodosByDate：返回指定截止日期且未完成的 Todo。
+*/
+function getTodosByDate(date) {
+  return getActiveTodos().filter(function (todo) {
+    return todo.dueDate === date;
+  });
+}
+
+/*
   createTodo：根据输入数据创建符合约定结构的 Todo 对象。
 */
 function createTodo(todoData) {

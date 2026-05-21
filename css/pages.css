@@ -481,9 +481,90 @@
   border-color: transparent;
 }
 
+.calendar-cell.is-selected {
+  border-color: #1f6feb;
+  background-color: #e8f0fe;
+}
+
 .calendar-cell__number {
   font-size: 14px;
   color: #1f2933;
+}
+
+.calendar-cell__todos {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.calendar-cell__todo {
+  font-size: 12px;
+  color: #1f2933;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-cell__more {
+  font-size: 12px;
+  color: #5d6978;
+  font-weight: 700;
+}
+
+.calendar-selected-panel {
+  margin-top: 20px;
+  padding: 14px;
+  border: 1px solid #d9e0e8;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.calendar-selected-panel__title {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #1f2933;
+}
+
+.calendar-selected-panel__empty {
+  margin: 0;
+  color: #5d6978;
+}
+
+.calendar-selected-panel__list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.calendar-selected-panel__item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #d9e0e8;
+  border-radius: 6px;
+  background-color: #f8fafc;
+}
+
+.calendar-selected-panel__todo-title {
+  flex: 1 1 100%;
+  font-weight: 700;
+  color: #1f2933;
+}
+
+.calendar-selected-panel__quadrant {
+  font-size: 13px;
+  color: #1f6b34;
+  background-color: #edf7ed;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.calendar-selected-panel__due-date {
+  font-size: 13px;
+  color: #5d6978;
 }
 
 @media (max-width: 640px) {
