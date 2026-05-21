@@ -633,6 +633,43 @@
   font-weight: 500;
 }
 
+.calendar-selected-panel__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.calendar-selected-panel__complete,
+.calendar-selected-panel__delete {
+  padding: 6px 12px;
+  border: 1px solid;
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.calendar-selected-panel__complete {
+  color: #1f6feb;
+  border-color: #1f6feb;
+}
+
+.calendar-selected-panel__complete:hover {
+  color: #ffffff;
+  background-color: #1f6feb;
+}
+
+.calendar-selected-panel__delete {
+  color: #d1242f;
+  border-color: #d1242f;
+}
+
+.calendar-selected-panel__delete:hover {
+  color: #ffffff;
+  background-color: #d1242f;
+}
+
 @media (max-width: 640px) {
   .todo-form__row,
   .todo-form__grid,

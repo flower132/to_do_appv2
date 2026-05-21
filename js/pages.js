@@ -260,6 +260,10 @@ const calendarPage = (function () {
               '<span class="calendar-selected-panel__todo-title' + overdueClass + '">' + escapePageHtml(todo.title) + "</span>" +
               '<span class="calendar-selected-panel__quadrant">' + escapePageHtml(getPageQuadrantLabel(todo.quadrant)) + "</span>" +
               '<span class="calendar-selected-panel__due-date">' + escapePageHtml(todo.dueDate || "无截止日期") + "</span>" +
+              '<span class="calendar-selected-panel__actions">' +
+                '<button class="calendar-selected-panel__complete" type="button" data-action="complete" data-id="' + todo.id + '">完成</button>' +
+                '<button class="calendar-selected-panel__delete" type="button" data-action="delete" data-id="' + todo.id + '">删除</button>' +
+              "</span>" +
             "</li>"
           );
         }).join("") +
@@ -282,16 +286,20 @@ const calendarPage = (function () {
   }
 
   /*
-    setupCalendarPageEvents：绑定日历导航按钮事件。
+    setupCalendarPageEvents：绑定日历导航按钮事件和选中面板事件。
   */
   function setupCalendarPageEvents() {
     var widget = pageContent.querySelector(".calendar-widget");
 
-    if (widget === null) {
-      return;
+    if (widget !== null) {
+      widget.addEventListener("click", handleCalendarClick);
     }
 
-    widget.addEventListener("click", handleCalendarClick);
+    var panel = pageContent.querySelector(".calendar-selected-panel");
+
+    if (panel !== null) {
+      panel.addEventListener("click", handleSelectedPanelClick);
+    }
   }
 
   /*
@@ -314,6 +322,26 @@ const calendarPage = (function () {
 
     if (date !== undefined && date !== "") {
       calendarViewState.selectedDate = date;
+      renderCalendarPage();
+      return;
+    }
+  }
+
+  /*
+    handleSelectedPanelClick：处理选中日期面板的完成和删除按钮点击。
+  */
+  function handleSelectedPanelClick(event) {
+    var action = event.target.dataset.action;
+    var id = event.target.dataset.id;
+
+    if (action === "complete" && id !== undefined) {
+      toggleTodo(id);
+      renderCalendarPage();
+      return;
+    }
+
+    if (action === "delete" && id !== undefined) {
+      deleteTodo(id);
       renderCalendarPage();
       return;
     }
