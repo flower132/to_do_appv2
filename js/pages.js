@@ -72,7 +72,8 @@ const calendarPage = (function () {
   };
 
   const calendarViewState = {
-    selectedDate: null
+    selectedDate: null,
+    selectedTodos: []
   };
 
   const monthNames = [
@@ -251,12 +252,32 @@ const calendarPage = (function () {
       return '<p class="calendar-selected-panel__empty">该日期没有 Todo。</p>';
     }
 
+    var visibleIds = todos.map(function (todo) { return todo.id; });
+    var allSelected = visibleIds.every(function (id) {
+      return calendarViewState.selectedTodos.includes(id);
+    });
+
+    var bulkActionsHtml =
+      '<div class="calendar-bulk-actions">' +
+        '<button class="calendar-bulk-actions__button" type="button" data-action="toggle-select-all">' + (allSelected ? "取消全选" : "全选") + '</button>';
+
+    if (calendarViewState.selectedTodos.length > 0) {
+      bulkActionsHtml +=
+        '<button class="calendar-bulk-actions__button calendar-bulk-actions__button--complete" type="button" data-action="bulk-complete">批量完成 (' + calendarViewState.selectedTodos.length + ')</button>' +
+        '<button class="calendar-bulk-actions__button calendar-bulk-actions__button--delete" type="button" data-action="bulk-delete">批量删除 (' + calendarViewState.selectedTodos.length + ')</button>';
+    }
+
+    bulkActionsHtml += "</div>";
+
     return (
+      bulkActionsHtml +
       '<ul class="calendar-selected-panel__list">' +
         todos.map(function (todo) {
           var overdueClass = isCalendarTodoOverdue(todo) ? " is-overdue" : "";
+          var isSelected = calendarViewState.selectedTodos.includes(todo.id) ? " checked" : "";
           return (
             '<li class="calendar-selected-panel__item">' +
+              '<input class="calendar-selected-panel__select" type="checkbox" data-action="select" data-id="' + todo.id + '"' + isSelected + '>' +
               '<span class="calendar-selected-panel__todo-title' + overdueClass + '">' + escapePageHtml(todo.title) + "</span>" +
               '<span class="calendar-selected-panel__quadrant">' + escapePageHtml(getPageQuadrantLabel(todo.quadrant)) + "</span>" +
               '<span class="calendar-selected-panel__due-date">' + escapePageHtml(todo.dueDate || "无截止日期") + "</span>" +
@@ -299,6 +320,7 @@ const calendarPage = (function () {
 
     if (panel !== null) {
       panel.addEventListener("click", handleSelectedPanelClick);
+      panel.addEventListener("change", handleSelectedPanelChange);
     }
   }
 
@@ -345,6 +367,66 @@ const calendarPage = (function () {
       renderCalendarPage();
       return;
     }
+
+    if (action === "toggle-select-all") {
+      var selectedDate = calendarViewState.selectedDate;
+      var todos = getTodosByDate(selectedDate);
+      var visibleIds = todos.map(function (todo) { return todo.id; });
+
+      var allSelected = visibleIds.every(function (todoId) {
+        return calendarViewState.selectedTodos.includes(todoId);
+      });
+
+      if (allSelected) {
+        calendarViewState.selectedTodos = [];
+      } else {
+        visibleIds.forEach(function (todoId) {
+          if (!calendarViewState.selectedTodos.includes(todoId)) {
+            calendarViewState.selectedTodos.push(todoId);
+          }
+        });
+      }
+      renderCalendarPage();
+      return;
+    }
+
+    if (action === "bulk-complete") {
+      calendarViewState.selectedTodos.forEach(function (todoId) {
+        toggleTodo(todoId);
+      });
+      calendarViewState.selectedTodos = [];
+      renderCalendarPage();
+      return;
+    }
+
+    if (action === "bulk-delete") {
+      calendarViewState.selectedTodos.forEach(function (todoId) {
+        deleteTodo(todoId);
+      });
+      calendarViewState.selectedTodos = [];
+      renderCalendarPage();
+      return;
+    }
+  }
+
+  /*
+    handleSelectedPanelChange：处理选中日期面板的选择 checkbox 变化。
+  */
+  function handleSelectedPanelChange(event) {
+    var action = event.target.dataset.action;
+    var id = event.target.dataset.id;
+
+    if (action === "select" && id !== undefined) {
+      if (event.target.checked) {
+        calendarViewState.selectedTodos.push(id);
+      } else {
+        calendarViewState.selectedTodos = calendarViewState.selectedTodos.filter(function (selectedId) {
+          return selectedId !== id;
+        });
+      }
+      renderCalendarPage();
+      return;
+    }
   }
 
   /*
@@ -384,7 +466,8 @@ const todoPage = (function () {
   const viewState = {
     sortBy: "createdAt",
     search: "",
-    quadrantView: "all"
+    quadrantView: "all",
+    selectedTodos: []
   };
 
   /*
@@ -437,6 +520,7 @@ const todoPage = (function () {
           "</label>" +
         "</form>" +
         createTodoControlsHtml() +
+        createTodoBulkActionsHtml() +
         createQuadrantsHtml() +
       "</section>"
     );
@@ -471,6 +555,35 @@ const todoPage = (function () {
         "</label>" +
       "</div>"
     );
+  }
+
+  /*
+    createTodoBulkActionsHtml：创建批量操作按钮栏。
+  */
+  function createTodoBulkActionsHtml() {
+    const visibleTodos = getVisibleTodos();
+    const visibleIds = viewState.quadrantView === "all"
+      ? visibleTodos.map(function (todo) { return todo.id; })
+      : getQuadrantTodos(visibleTodos, viewState.quadrantView).map(function (todo) { return todo.id; });
+
+    if (visibleIds.length === 0) {
+      return "";
+    }
+
+    const allSelected = visibleIds.every(function (id) {
+      return viewState.selectedTodos.includes(id);
+    });
+
+    var selectAllHtml = '<button class="todo-bulk-actions__button" type="button" data-action="toggle-select-all">' + (allSelected ? "取消全选" : "全选") + "</button>";
+    var bulkHtml = "";
+
+    if (viewState.selectedTodos.length > 0) {
+      bulkHtml =
+        '<button class="todo-bulk-actions__button todo-bulk-actions__button--complete" type="button" data-action="bulk-complete">批量完成 (' + viewState.selectedTodos.length + ')</button>' +
+        '<button class="todo-bulk-actions__button todo-bulk-actions__button--delete" type="button" data-action="bulk-delete">批量删除 (' + viewState.selectedTodos.length + ')</button>';
+    }
+
+    return '<div class="todo-bulk-actions">' + selectAllHtml + bulkHtml + "</div>";
   }
 
   /*
@@ -618,9 +731,11 @@ const todoPage = (function () {
   function createTodoItemHtml(todo) {
     const dueDateHtml = hasDueDate(todo.dueDate) ? '<span class="todo-item__meta">截止：' + escapeHtml(todo.dueDate) + "</span>" : "";
     const noteHtml = todo.note === "" ? "" : '<span class="todo-item__note">备注：' + escapeHtml(todo.note) + "</span>";
+    const isSelected = viewState.selectedTodos.includes(todo.id) ? " checked" : "";
 
     return (
       '<li class="todo-item">' +
+        '<input class="todo-item__select" type="checkbox" data-action="select" data-id="' + todo.id + '"' + isSelected + '>' +
         '<label class="todo-item__main">' +
           '<input class="todo-item__checkbox" type="checkbox" data-action="toggle" data-id="' + todo.id + '">' +
           '<span class="todo-item__content">' +
@@ -658,6 +773,7 @@ const todoPage = (function () {
     const todoSearch = document.querySelector("#todo-search");
     const todoQuadrantView = document.querySelector("#todo-quadrant-view");
     const todoLists = document.querySelectorAll(".todo-list");
+    const todoBulkActions = document.querySelector(".todo-bulk-actions");
 
     todoForm.addEventListener("submit", handleTodoSubmit);
     todoSortBy.addEventListener("change", handleTodoSortChange);
@@ -668,6 +784,10 @@ const todoPage = (function () {
       todoList.addEventListener("change", handleTodoListChange);
       todoList.addEventListener("click", handleTodoListClick);
     });
+
+    if (todoBulkActions !== null) {
+      todoBulkActions.addEventListener("click", handleTodoBulkActionsClick);
+    }
   }
 
   /*
@@ -718,15 +838,29 @@ const todoPage = (function () {
   }
 
   /*
-    handleTodoListChange：处理 Todo 列表里的完成状态切换。
+    handleTodoListChange：处理 Todo 列表里的完成状态切换和选择状态切换。
   */
   function handleTodoListChange(event) {
-    if (event.target.dataset.action !== "toggle") {
+    var action = event.target.dataset.action;
+    var id = event.target.dataset.id;
+
+    if (action === "toggle" && id !== undefined) {
+      toggleTodo(id);
+      renderTodoPage();
       return;
     }
 
-    toggleTodo(event.target.dataset.id);
-    renderTodoPage();
+    if (action === "select" && id !== undefined) {
+      if (event.target.checked) {
+        viewState.selectedTodos.push(id);
+      } else {
+        viewState.selectedTodos = viewState.selectedTodos.filter(function (selectedId) {
+          return selectedId !== id;
+        });
+      }
+      renderTodoPage();
+      return;
+    }
   }
 
   /*
@@ -739,6 +873,54 @@ const todoPage = (function () {
 
     deleteTodo(event.target.dataset.id);
     renderTodoPage();
+  }
+
+  /*
+    handleTodoBulkActionsClick：处理批量完成和批量删除按钮点击。
+  */
+  function handleTodoBulkActionsClick(event) {
+    var action = event.target.dataset.action;
+
+    if (action === "toggle-select-all") {
+      var visibleTodos = getVisibleTodos();
+      var visibleIds = viewState.quadrantView === "all"
+        ? visibleTodos.map(function (todo) { return todo.id; })
+        : getQuadrantTodos(visibleTodos, viewState.quadrantView).map(function (todo) { return todo.id; });
+
+      var allSelected = visibleIds.every(function (id) {
+        return viewState.selectedTodos.includes(id);
+      });
+
+      if (allSelected) {
+        viewState.selectedTodos = [];
+      } else {
+        visibleIds.forEach(function (id) {
+          if (!viewState.selectedTodos.includes(id)) {
+            viewState.selectedTodos.push(id);
+          }
+        });
+      }
+      renderTodoPage();
+      return;
+    }
+
+    if (action === "bulk-complete") {
+      viewState.selectedTodos.forEach(function (todoId) {
+        toggleTodo(todoId);
+      });
+      viewState.selectedTodos = [];
+      renderTodoPage();
+      return;
+    }
+
+    if (action === "bulk-delete") {
+      viewState.selectedTodos.forEach(function (todoId) {
+        deleteTodo(todoId);
+      });
+      viewState.selectedTodos = [];
+      renderTodoPage();
+      return;
+    }
   }
 
   /*
@@ -799,6 +981,10 @@ const todoPage = (function () {
 }());
 
 const historyPage = (function () {
+  var historyViewState = {
+    selectedTodos: []
+  };
+
   /*
     renderHistoryPage：根据 data.js 提供的已完成 todos 渲染 History 页面。
   */
@@ -839,8 +1025,25 @@ const historyPage = (function () {
       );
     }
 
+    var visibleIds = completedTodos.map(function (todo) { return todo.id; });
+    var allSelected = visibleIds.every(function (id) {
+      return historyViewState.selectedTodos.includes(id);
+    });
+
+    var bulkActionsHtml =
+      '<div class="history-bulk-actions">' +
+        '<button class="history-bulk-actions__button" type="button" data-action="toggle-select-all">' + (allSelected ? "取消全选" : "全选") + '</button>';
+
+    if (historyViewState.selectedTodos.length > 0) {
+      bulkActionsHtml +=
+        '<button class="history-bulk-actions__button history-bulk-actions__button--delete" type="button" data-action="bulk-delete">批量删除 (' + historyViewState.selectedTodos.length + ')</button>';
+    }
+
+    bulkActionsHtml += "</div>";
+
     return (
       '<div class="history-page">' +
+        bulkActionsHtml +
         '<ul class="history-list">' +
           completedTodos.map(createHistoryItemHtml).join("") +
         "</ul>" +
@@ -860,24 +1063,28 @@ const historyPage = (function () {
     var noteHtml = todo.note === ""
       ? ""
       : '<p class="history-item__note">备注：' + escapePageHtml(todo.note) + "</p>";
+    var isSelected = historyViewState.selectedTodos.includes(todo.id) ? " checked" : "";
 
     return (
       '<li class="history-item">' +
-        '<div class="history-item__content">' +
-          '<div class="history-item__topline">' +
-            '<span class="history-item__status">已完成</span>' +
-            '<span class="history-item__quadrant">' + escapePageHtml(quadrantLabel) + "</span>" +
+        '<input class="history-item__select" type="checkbox" data-action="select" data-id="' + todo.id + '"' + isSelected + '>' +
+        '<div class="history-item__body">' +
+          '<div class="history-item__content">' +
+            '<div class="history-item__topline">' +
+              '<span class="history-item__status">已完成</span>' +
+              '<span class="history-item__quadrant">' + escapePageHtml(quadrantLabel) + "</span>" +
+            "</div>" +
+            '<h3 class="history-item__title">' + escapePageHtml(todo.title) + "</h3>" +
+            '<div class="history-item__meta-row">' +
+              dueDateHtml +
+              completedAtHtml +
+            "</div>" +
+            noteHtml +
           "</div>" +
-          '<h3 class="history-item__title">' + escapePageHtml(todo.title) + "</h3>" +
-          '<div class="history-item__meta-row">' +
-            dueDateHtml +
-            completedAtHtml +
+          '<div class="history-item__actions">' +
+            '<button class="history-item__restore" type="button" data-action="restore" data-id="' + todo.id + '">恢复</button>' +
+            '<button class="history-item__delete" type="button" data-action="delete" data-id="' + todo.id + '">永久删除</button>' +
           "</div>" +
-          noteHtml +
-        "</div>" +
-        '<div class="history-item__actions">' +
-          '<button class="history-item__restore" type="button" data-action="restore" data-id="' + todo.id + '">恢复</button>' +
-          '<button class="history-item__delete" type="button" data-action="delete" data-id="' + todo.id + '">永久删除</button>' +
         "</div>" +
       "</li>"
     );
@@ -885,25 +1092,83 @@ const historyPage = (function () {
 
   function setupHistoryPageEvents() {
     var historyList = document.querySelector(".history-list");
+    var historyBulkActions = document.querySelector(".history-bulk-actions");
 
-    if (historyList === null) {
-      return;
+    if (historyList !== null) {
+      historyList.addEventListener("click", handleHistoryClick);
+      historyList.addEventListener("change", handleHistoryChange);
     }
 
-    historyList.addEventListener("click", handleHistoryClick);
+    if (historyBulkActions !== null) {
+      historyBulkActions.addEventListener("click", handleHistoryBulkClick);
+    }
   }
 
   function handleHistoryClick(event) {
     var action = event.target.dataset.action;
+    var id = event.target.dataset.id;
 
-    if (action === "restore") {
-      restoreTodo(event.target.dataset.id);
+    if (action === "restore" && id !== undefined) {
+      restoreTodo(id);
       renderHistoryPage();
       return;
     }
 
-    if (action === "delete") {
-      deleteTodo(event.target.dataset.id);
+    if (action === "delete" && id !== undefined) {
+      deleteTodo(id);
+      renderHistoryPage();
+      return;
+    }
+  }
+
+  function handleHistoryChange(event) {
+    var action = event.target.dataset.action;
+    var id = event.target.dataset.id;
+
+    if (action === "select" && id !== undefined) {
+      if (event.target.checked) {
+        historyViewState.selectedTodos.push(id);
+      } else {
+        historyViewState.selectedTodos = historyViewState.selectedTodos.filter(function (selectedId) {
+          return selectedId !== id;
+        });
+      }
+      renderHistoryPage();
+      return;
+    }
+  }
+
+  function handleHistoryBulkClick(event) {
+    var action = event.target.dataset.action;
+
+    if (action === "toggle-select-all") {
+      var completedTodos = getCompletedTodos().sort(function (firstTodo, secondTodo) {
+        return getPageTimeValue(secondTodo.createdAt) - getPageTimeValue(firstTodo.createdAt);
+      });
+      var visibleIds = completedTodos.map(function (todo) { return todo.id; });
+
+      var allSelected = visibleIds.every(function (todoId) {
+        return historyViewState.selectedTodos.includes(todoId);
+      });
+
+      if (allSelected) {
+        historyViewState.selectedTodos = [];
+      } else {
+        visibleIds.forEach(function (todoId) {
+          if (!historyViewState.selectedTodos.includes(todoId)) {
+            historyViewState.selectedTodos.push(todoId);
+          }
+        });
+      }
+      renderHistoryPage();
+      return;
+    }
+
+    if (action === "bulk-delete") {
+      historyViewState.selectedTodos.forEach(function (todoId) {
+        deleteTodo(todoId);
+      });
+      historyViewState.selectedTodos = [];
       renderHistoryPage();
       return;
     }

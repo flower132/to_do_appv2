@@ -260,7 +260,6 @@
 .todo-item {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 12px;
   padding: 14px;
   border: 1px solid #d9e0e8;
@@ -272,6 +271,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  flex: 1;
   min-width: 0;
 }
 
@@ -726,4 +726,74 @@
   .calendar-selected-panel__item {
     padding: 10px;
   }
+}
+
+/* Batch selection checkbox */
+.todo-item__select,
+.calendar-selected-panel__select,
+.history-item__select {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* History item layout for batch selection */
+.history-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.history-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Bulk actions toolbar */
+.todo-bulk-actions,
+.calendar-bulk-actions,
+.history-bulk-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.todo-bulk-actions__button,
+.calendar-bulk-actions__button,
+.history-bulk-actions__button {
+  padding: 8px 14px;
+  border: 1px solid;
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.todo-bulk-actions__button--complete,
+.calendar-bulk-actions__button--complete {
+  color: #1f6feb;
+  border-color: #1f6feb;
+}
+
+.todo-bulk-actions__button--complete:hover,
+.calendar-bulk-actions__button--complete:hover {
+  color: #ffffff;
+  background-color: #1f6feb;
+}
+
+.todo-bulk-actions__button--delete,
+.calendar-bulk-actions__button--delete,
+.history-bulk-actions__button--delete {
+  color: #d1242f;
+  border-color: #d1242f;
+}
+
+.todo-bulk-actions__button--delete:hover,
+.calendar-bulk-actions__button--delete:hover,
+.history-bulk-actions__button--delete:hover {
+  color: #ffffff;
+  background-color: #d1242f;
 }
