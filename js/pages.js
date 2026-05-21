@@ -394,6 +394,10 @@ const todoPage = (function () {
                 '<option value="not-urgent-not-important">不重要不紧急</option>' +
               "</select>" +
             "</label>" +
+            '<label class="todo-form__field" for="todo-start-date">' +
+              '<span class="todo-form__field-label">开始日期</span>' +
+              '<input class="todo-form__input" id="todo-start-date" name="startDate" type="date">' +
+            "</label>" +
             '<label class="todo-form__field" for="todo-due-date">' +
               '<span class="todo-form__field-label">截止日期</span>' +
               '<input class="todo-form__input" id="todo-due-date" name="dueDate" type="date">' +
@@ -655,6 +659,7 @@ const todoPage = (function () {
     addTodo({
       title: title,
       quadrant: form.elements.quadrant.value,
+      startDate: form.elements.startDate.value,
       dueDate: form.elements.dueDate.value,
       note: form.elements.note.value.trim()
     });
