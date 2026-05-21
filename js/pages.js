@@ -152,10 +152,20 @@ const calendarPage = (function () {
   /*
     createCalendarGridHtml：创建日期网格，包含空白补齐和日期 cell。
   */
+  function getCalendarTodayString() {
+    var d = new Date();
+    return formatCalendarDate(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function isCalendarTodoOverdue(todo) {
+    return todo.dueDate !== null && todo.dueDate !== "" && todo.dueDate < getCalendarTodayString();
+  }
+
   function createCalendarGridHtml(year, month) {
     const daysInMonth = getDaysInMonth(year, month);
     const firstDayOfWeek = getFirstDayOfWeek(year, month);
     const cells = [];
+    var todayString = getCalendarTodayString();
 
     for (var i = 0; i < firstDayOfWeek; i++) {
       cells.push('<div class="calendar-cell calendar-cell--empty"></div>');
@@ -167,10 +177,13 @@ const calendarPage = (function () {
       var todosHtml = createCalendarCellTodosHtml(dayTodos);
       var isSelected = dateString === calendarViewState.selectedDate;
       var selectedClass = isSelected ? " is-selected" : "";
+      var isToday = dateString === todayString;
+      var todayClass = isToday ? " is-today" : "";
+      var numberTodayClass = isToday ? " is-today" : "";
 
       cells.push(
-        '<div class="calendar-cell' + selectedClass + '" data-date="' + dateString + '">' +
-          '<span class="calendar-cell__number">' + day + "</span>" +
+        '<div class="calendar-cell' + selectedClass + todayClass + '" data-date="' + dateString + '">' +
+          '<span class="calendar-cell__number' + numberTodayClass + '">' + day + "</span>" +
           todosHtml +
         "</div>"
       );
@@ -204,7 +217,8 @@ const calendarPage = (function () {
     var remaining = todos.length - maxVisible;
 
     var itemsHtml = visibleTodos.map(function (todo) {
-      return '<div class="calendar-cell__todo">' + escapePageHtml(todo.title) + "</div>";
+      var overdueClass = isCalendarTodoOverdue(todo) ? " is-overdue" : "";
+      return '<div class="calendar-cell__todo' + overdueClass + '">' + escapePageHtml(todo.title) + "</div>";
     }).join("");
 
     var moreHtml = remaining > 0
@@ -241,9 +255,10 @@ const calendarPage = (function () {
     return (
       '<ul class="calendar-selected-panel__list">' +
         todos.map(function (todo) {
+          var overdueClass = isCalendarTodoOverdue(todo) ? " is-overdue" : "";
           return (
             '<li class="calendar-selected-panel__item">' +
-              '<span class="calendar-selected-panel__todo-title">' + escapePageHtml(todo.title) + "</span>" +
+              '<span class="calendar-selected-panel__todo-title' + overdueClass + '">' + escapePageHtml(todo.title) + "</span>" +
               '<span class="calendar-selected-panel__quadrant">' + escapePageHtml(getPageQuadrantLabel(todo.quadrant)) + "</span>" +
               '<span class="calendar-selected-panel__due-date">' + escapePageHtml(todo.dueDate || "无截止日期") + "</span>" +
             "</li>"
