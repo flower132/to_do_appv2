@@ -60,10 +60,23 @@ if (remainingAfterComplete !== 1) {
   process.exit(1);
 }
 
-// 6. Go to History and verify completed todo is there
+// 6. Go to Todo page and verify completed todo is NOT in quadrants
+await page.click('button[data-page="todo"]');
+await page.waitForTimeout(200);
+await screenshot('05-todo-after-complete');
+
+const todoItemsAfterComplete = await page.locator('.todo-item').count();
+console.log('Todo items after complete:', todoItemsAfterComplete);
+if (todoItemsAfterComplete !== 1) {
+  console.error('Expected 1 todo in Todo page after complete, got', todoItemsAfterComplete);
+  await browser.close();
+  process.exit(1);
+}
+
+// 7. Go to History and verify completed todo is there
 await page.click('button[data-page="history"]');
 await page.waitForTimeout(200);
-await screenshot('05-history-after-complete');
+await screenshot('06-history-after-complete');
 
 const historyItems = await page.locator('.history-item').count();
 console.log('History items after complete:', historyItems);
@@ -73,19 +86,19 @@ if (historyItems !== 1) {
   process.exit(1);
 }
 
-// 7. Go back to Calendar and delete the second todo
+// 8. Go back to Calendar and delete the second todo
 await page.click('button[data-page="calendar"]');
 await page.waitForTimeout(200);
 
 const cellAgain = await page.locator('.calendar-cell[data-date="2026-05-25"]');
 await cellAgain.click();
 await page.waitForTimeout(200);
-await screenshot('06-back-to-calendar');
+await screenshot('07-back-to-calendar');
 
 const deleteBtn = await page.locator('button[data-action="delete"]').first();
 await deleteBtn.click();
 await page.waitForTimeout(300);
-await screenshot('07-after-delete');
+await screenshot('08-after-delete');
 
 // Verify panel is empty
 const remainingAfterDelete = await page.locator('.calendar-selected-panel__item').count();
@@ -104,7 +117,7 @@ await page.waitForTimeout(200);
 const cellReload = await page.locator('.calendar-cell[data-date="2026-05-25"]');
 await cellReload.click();
 await page.waitForTimeout(200);
-await screenshot('08-after-reload');
+await screenshot('09-after-reload');
 
 const afterReload = await page.locator('.calendar-selected-panel__item').count();
 console.log('Panel items after reload:', afterReload);

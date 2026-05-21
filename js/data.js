@@ -45,7 +45,8 @@ function saveTodos() {
 }
 
 /*
-  getTodos：返回当前 Todo 列表，供页面渲染使用。
+  getTodos：返回当前 Todo 列表的引用。
+  警告：仅供调试或管理操作使用，UI 渲染必须走 getActiveTodos() / getCompletedTodos() / getTodosByDate() 等 query 层。
 */
 function getTodos() {
   return todos;
@@ -106,7 +107,7 @@ function normalizeTodo(todo) {
   return {
     id: source.id === undefined || source.id === null ? createTodoId() : source.id,
     title: getValueOrDefault(source.title, ""),
-    isCompleted: getValueOrDefault(source.isCompleted, false),
+    isCompleted: source.isCompleted === true,
     quadrant: normalizeQuadrant(source.quadrant),
     startDate: normalizeDueDate(source.startDate),
     dueDate: normalizeDueDate(source.dueDate),

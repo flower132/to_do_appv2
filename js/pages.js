@@ -525,14 +525,14 @@ const todoPage = (function () {
   }
 
   /*
-    getVisibleTodos：从数据源经 query layer 派生最终可见 Todo。
+    getVisibleTodos：从 data.js 经 query layer 派生 Todo 列表（搜索 + 排序）。
+    象限过滤只在 createQuadrantPanelHtml 中做一次，避免双重 filter。
   */
   function getVisibleTodos() {
     const todos = getActiveTodos();
     const searchedTodos = getSearchedTodos(todos);
-    const quadrantTodos = getQuadrantTodos(searchedTodos);
 
-    return getSortedTodos(quadrantTodos);
+    return getSortedTodos(searchedTodos);
   }
 
   /*
@@ -612,18 +612,17 @@ const todoPage = (function () {
   }
 
   /*
-    createTodoItemHtml：根据单个 Todo 对象创建列表项 HTML。
+    createTodoItemHtml：根据单个 active Todo 对象创建列表项 HTML。
+    数据源已通过 getActiveTodos() 过滤，因此不需要处理 completed 状态。
   */
   function createTodoItemHtml(todo) {
-    const completedClass = todo.isCompleted ? " is-completed" : "";
-    const checkedText = todo.isCompleted ? "checked" : "";
     const dueDateHtml = hasDueDate(todo.dueDate) ? '<span class="todo-item__meta">截止：' + escapeHtml(todo.dueDate) + "</span>" : "";
     const noteHtml = todo.note === "" ? "" : '<span class="todo-item__note">备注：' + escapeHtml(todo.note) + "</span>";
 
     return (
-      '<li class="todo-item' + completedClass + '">' +
+      '<li class="todo-item">' +
         '<label class="todo-item__main">' +
-          '<input class="todo-item__checkbox" type="checkbox" data-action="toggle" data-id="' + todo.id + '" ' + checkedText + ">" +
+          '<input class="todo-item__checkbox" type="checkbox" data-action="toggle" data-id="' + todo.id + '">' +
           '<span class="todo-item__content">' +
             '<span class="todo-item__quadrant">[' + escapeHtml(getQuadrantLabel(todo.quadrant)) + "]</span>" +
             '<span class="todo-item__title">' + escapeHtml(todo.title) + "</span>" +
