@@ -153,8 +153,7 @@ const calendarPage = (function () {
     createCalendarGridHtml：创建日期网格，包含空白补齐和日期 cell。
   */
   function getCalendarTodayString() {
-    var d = new Date();
-    return formatCalendarDate(d.getFullYear(), d.getMonth(), d.getDate());
+    return getTodayString();
   }
 
   function isCalendarTodoOverdue(todo) {
@@ -656,7 +655,7 @@ const todoPage = (function () {
     addTodo({
       title: title,
       quadrant: form.elements.quadrant.value,
-      dueDate: form.elements.dueDate.value === "" ? null : form.elements.dueDate.value,
+      dueDate: form.elements.dueDate.value,
       note: form.elements.note.value.trim()
     });
     renderTodoPage();

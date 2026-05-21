@@ -6,6 +6,10 @@
 
 const TODO_STORAGE_KEY = "lily-todo-app-v2-todos";
 
+function getTodayString() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 let todos = loadTodos();
 
 /*
@@ -79,13 +83,15 @@ function getTodosByDate(date) {
 */
 function createTodo(todoData) {
   const data = normalizeTodoInput(todoData);
+  const dueDate = normalizeDueDate(data.dueDate);
 
   return {
     id: createTodoId(),
     title: getValueOrDefault(data.title, ""),
     isCompleted: false,
     quadrant: normalizeQuadrant(data.quadrant),
-    dueDate: normalizeDueDate(data.dueDate),
+    startDate: normalizeDueDate(data.startDate),
+    dueDate: dueDate === null ? getTodayString() : dueDate,
     note: getValueOrDefault(data.note, ""),
     createdAt: new Date().toISOString()
   };
@@ -102,6 +108,7 @@ function normalizeTodo(todo) {
     title: getValueOrDefault(source.title, ""),
     isCompleted: getValueOrDefault(source.isCompleted, false),
     quadrant: normalizeQuadrant(source.quadrant),
+    startDate: normalizeDueDate(source.startDate),
     dueDate: normalizeDueDate(source.dueDate),
     note: getValueOrDefault(source.note, ""),
     createdAt: source.createdAt === undefined || source.createdAt === null ? new Date().toISOString() : source.createdAt
@@ -231,7 +238,7 @@ function computeQuadrant(todo) {
   const hasNote = note !== "";
   const isImportant = source.isImportant === undefined ? hasNote : source.isImportant;
   const isUrgent = source.isUrgent === undefined ? hasDueDate : source.isUrgent;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getTodayString();
 
   if (source.isCompleted === true) {
     return "DONE";
