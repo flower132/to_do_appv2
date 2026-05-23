@@ -1,7 +1,8 @@
 /*
   settings.js
   用途：管理应用级 UI 设置（主题、字体、语言、默认页面等）。
-  与 data.js 完全隔离，仅影响 UI 层，通过 data-* 属性和 CSS 生效。
+  与 data.js 完全隔离，仅影响 UI 层。
+  所有设置变更通过 appState 发布订阅中心广播，驱动 UI 自动更新。
 */
 
 const SETTINGS_STORAGE_KEY = "app-settings-v1";
@@ -251,6 +252,7 @@ function getSettings() {
 
 /*
   updateSetting：按路径更新单个设置项并立即保存。
+  保存后自动同步到 appState 发布订阅中心，驱动 UI 自动更新。
   例：updateSetting("appearance.theme", "dark")
 */
 function updateSetting(path, value) {
@@ -261,6 +263,10 @@ function updateSetting(path, value) {
   }
   target[keys[keys.length - 1]] = value;
   saveSettings();
+
+  if (typeof appState !== "undefined" && appState.sync) {
+    appState.sync();
+  }
 }
 
 /*
@@ -279,6 +285,7 @@ function getEffectiveTheme() {
 
 /*
   applySettingsToDOM：把当前设置应用到 document.documentElement 的 data-* 属性上。
+  颜色全部由 CSS Variables 驱动，不再通过 JS 内联样式设置。
 */
 function applySettingsToDOM() {
   const html = document.documentElement;
@@ -288,16 +295,6 @@ function applySettingsToDOM() {
   html.dataset.compact = String(settings.appearance.compactMode);
   html.dataset.locale = settings.language.locale;
   html.dataset.themeStyle = settings.appearance.themeStyle || "apple";
-
-  if (theme === "dark") {
-    html.style.setProperty("--sidebar-bg", "#1c1c1e");
-    html.style.setProperty("--sidebar-text", "#ffffff");
-    html.style.setProperty("--sidebar-hover-bg", "rgba(255, 255, 255, 0.06)");
-  } else {
-    html.style.setProperty("--sidebar-bg", "#f2f2f7");
-    html.style.setProperty("--sidebar-text", "#000000");
-    html.style.setProperty("--sidebar-hover-bg", "rgba(0, 0, 0, 0.04)");
-  }
 
   var metaTheme = document.querySelector('meta[name="theme-color"]');
   if (metaTheme) {

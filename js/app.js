@@ -1,7 +1,7 @@
 /*
   app.js
-  用途：应用入口文件。
-  页面加载完成后，从这里启动 App Shell。
+  应用入口文件。
+  全局状态订阅驱动 UI，App Shell 动态响应 Settings 变化。
 */
 
 const appQuotes = [
@@ -23,11 +23,46 @@ function getDailyQuote() {
   return appQuotes[seed % appQuotes.length];
 }
 
-function updateAppShellQuote() {
-  var el = document.getElementById("app-shell-quote");
-  if (el) {
-    el.textContent = getDailyQuote();
+function getGreeting(locale) {
+  var hour = new Date().getHours();
+  if (locale === "zh-CN") {
+    if (hour < 6) return "夜深了";
+    if (hour < 12) return "早上好";
+    if (hour < 18) return "下午好";
+    return "晚上好";
+  } else {
+    if (hour < 6) return "Good night";
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
   }
+}
+
+function updateAppShellContent(state) {
+  var el = document.getElementById("app-shell-quote");
+  if (!el) return;
+
+  var greeting = getGreeting(state.locale);
+  var quote = getDailyQuote();
+
+  el.className = "app-shell__content";
+  el.innerHTML = "";
+
+  var greetSpan = document.createElement("span");
+  greetSpan.className = "app-shell__greeting";
+  greetSpan.textContent = greeting;
+
+  var divider = document.createElement("span");
+  divider.className = "app-shell__divider";
+  divider.textContent = " · ";
+
+  var quoteSpan = document.createElement("span");
+  quoteSpan.className = "app-shell__quote";
+  quoteSpan.textContent = quote;
+
+  el.appendChild(greetSpan);
+  el.appendChild(divider);
+  el.appendChild(quoteSpan);
 }
 
 function updateStaticLabels() {
@@ -63,9 +98,6 @@ function updateStaticLabels() {
   if (currentPageName) {
     updateMobileHeader(currentPageName);
   }
-
-  updateInstallBannerText();
-  updateAppShellQuote();
 }
 
 function updateInstallBannerText() {
@@ -85,11 +117,17 @@ function updateInstallBannerText() {
 }
 
 /*
-  startApp：加载设置、应用到 DOM、初始化导航，并渲染默认页面。
+  startApp：初始化状态中心、订阅 UI、启动 App Shell。
 */
 function startApp() {
-  applySettingsToDOM();
-  updateStaticLabels();
+  appState.init();
+
+  // 全局 UI 订阅：theme / language / app-shell 自动响应 Settings 变化
+  appState.subscribe(updateGlobalTheme);
+  appState.subscribe(updateGlobalLabels);
+  appState.subscribe(updateAppShellContent);
+  appState.subscribe(reRenderCurrentPageOnLocaleChange);
+
   setupNavigation();
   setupSystemThemeListener();
   setupMobileNavigation();
@@ -101,7 +139,41 @@ function startApp() {
 }
 
 /*
-  setupSystemThemeListener：当主题为“跟随系统”时，监听系统主题变化。
+  Global Theme Subscriber：theme 变化时自动应用到 DOM。
+*/
+function updateGlobalTheme(state) {
+  applySettingsToDOM();
+  updateThemeColor();
+}
+
+/*
+  Global Labels Subscriber：language 变化时自动刷新所有静态文案。
+*/
+function updateGlobalLabels(state) {
+  updateStaticLabels();
+  updateInstallBannerText();
+}
+
+/*
+  Locale Change Page Re-render：当前页面在非 Settings 页时，自动重渲染以更新文案。
+*/
+var _lastLocaleForRerender = "";
+
+function reRenderCurrentPageOnLocaleChange(state) {
+  if (!_lastLocaleForRerender) {
+    _lastLocaleForRerender = state.locale;
+    return;
+  }
+  if (_lastLocaleForRerender === state.locale) return;
+  _lastLocaleForRerender = state.locale;
+
+  if (currentPageName && currentPageName !== "settings") {
+    renderPage(currentPageName);
+  }
+}
+
+/*
+  setupSystemThemeListener：当主题为"跟随系统"时，监听系统主题变化。
 */
 function setupSystemThemeListener() {
   const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -110,7 +182,7 @@ function setupSystemThemeListener() {
   }
   media.addEventListener("change", function () {
     if (getSettings().appearance.theme === "system") {
-      applySettingsToDOM();
+      appState.sync();
     }
   });
 }
@@ -147,7 +219,6 @@ function showToast(message, type) {
 
   container.appendChild(toast);
 
-  // 强制回流以触发 transition
   toast.offsetHeight;
 
   requestAnimationFrame(function () {
@@ -289,7 +360,7 @@ function handleQuickAddSubmit(event) {
 function updateThemeColor() {
   var meta = document.querySelector('meta[name="theme-color"]');
   if (!meta) return;
-  var theme = getEffectiveTheme();
+  var theme = appState.getState().theme;
   meta.content = theme === 'dark' ? '#0f172a' : '#007aff';
 }
 
