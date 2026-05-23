@@ -7,6 +7,7 @@
 .app-shell {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .sidebar {
@@ -43,20 +44,37 @@
   padding: 32px;
 }
 
-@media (max-width: 720px) {
+/* ================================
+   Mobile Layout (max-width: 768px)
+   ================================ */
+
+@media (max-width: 768px) {
   .app-shell {
     display: block;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-top: 56px;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   }
 
   .sidebar {
-    width: 100%;
-  }
-
-  .sidebar__nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: none;
   }
 
   .main-content {
-    padding: 20px;
+    padding: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mobile-header {
+    display: flex;
+  }
+
+  .mobile-tab-bar {
+    display: flex;
+  }
+
+  .fab-button {
+    display: flex;
   }
 }

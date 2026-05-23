@@ -1,0 +1,332 @@
+/* ================================================
+   PWA Product-Level Enhancements
+   用途：PWA 专属体验层样式，不污染业务逻辑
+   ================================================ */
+
+/* -----------------------------------------------
+   Install Banner
+   ----------------------------------------------- */
+.install-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top, 0px));
+  background-color: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform: translateY(-120%);
+  transition: transform 400ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.install-banner.is-visible {
+  transform: translateY(0);
+}
+
+.install-banner[hidden] {
+  display: none;
+}
+
+.install-banner__text {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2933;
+  line-height: 1.4;
+}
+
+.install-banner__action {
+  padding: 8px 16px;
+  background-color: #007aff;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.install-banner__action:active {
+  transform: scale(0.94);
+  opacity: 0.85;
+}
+
+.install-banner__close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* -----------------------------------------------
+   Standalone State Adaptations
+   ----------------------------------------------- */
+.pwa-standalone .install-banner {
+  display: none !important;
+}
+
+.pwa-standalone .mobile-header {
+  padding-top: env(safe-area-inset-top, 0px);
+  height: calc(56px + env(safe-area-inset-top, 0px));
+}
+
+.pwa-standalone .app-shell {
+  padding-top: calc(56px + env(safe-area-inset-top, 0px));
+}
+
+.pwa-standalone .fab-button {
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+}
+
+/* -----------------------------------------------
+   Safe Area Enhancements
+   ----------------------------------------------- */
+@supports (padding-top: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+}
+
+/* -----------------------------------------------
+   Mobile Tab Bar — System App Feel
+   ----------------------------------------------- */
+.mobile-tab {
+  position: relative;
+  overflow: hidden;
+  transition: color 150ms ease, transform 120ms ease;
+}
+
+.mobile-tab::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+}
+
+.mobile-tab:active {
+  transform: scale(0.92);
+}
+
+.mobile-tab:active::after {
+  opacity: 0.1;
+}
+
+.mobile-tab--center:active {
+  transform: none;
+}
+
+.mobile-tab--center:active .mobile-tab__center-icon {
+  transform: scale(0.88);
+}
+
+/* -----------------------------------------------
+   Apple-Style Press Feedback
+   ----------------------------------------------- */
+.btn-press,
+.nav-button,
+.todo-form__button,
+.settings-button,
+.calendar-nav__button,
+.calendar-selected-panel__complete,
+.calendar-selected-panel__delete,
+.history-item__restore,
+.history-item__delete,
+.todo-bulk-actions__button,
+.calendar-bulk-actions__button,
+.history-bulk-actions__button,
+.quick-add-panel__submit,
+.todo-item__delete,
+.todo-item,
+.history-item,
+.calendar-cell,
+.calendar-selected-panel__item,
+.readonly-todo {
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-press::after,
+.nav-button::after,
+.todo-form__button::after,
+.settings-button::after,
+.calendar-nav__button::after,
+.calendar-selected-panel__complete::after,
+.calendar-selected-panel__delete::after,
+.history-item__restore::after,
+.history-item__delete::after,
+.todo-bulk-actions__button::after,
+.calendar-bulk-actions__button::after,
+.history-bulk-actions__button::after,
+.quick-add-panel__submit::after,
+.todo-item__delete::after,
+.todo-item::after,
+.history-item::after,
+.calendar-cell::after,
+.calendar-selected-panel__item::after,
+.readonly-todo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+}
+
+.btn-press:active::after,
+.nav-button:active::after,
+.todo-form__button:active::after,
+.settings-button:active::after,
+.calendar-nav__button:active::after,
+.calendar-selected-panel__complete:active::after,
+.calendar-selected-panel__delete:active::after,
+.history-item__restore:active::after,
+.history-item__delete:active::after,
+.todo-bulk-actions__button:active::after,
+.calendar-bulk-actions__button:active::after,
+.history-bulk-actions__button:active::after,
+.quick-add-panel__submit:active::after,
+.todo-item__delete:active::after,
+.todo-item:active::after,
+.history-item:active::after,
+.calendar-cell:active::after,
+.calendar-selected-panel__item:active::after,
+.readonly-todo:active::after {
+  opacity: 0.1;
+}
+
+/* -----------------------------------------------
+   Toast — iOS Style Enhancement
+   ----------------------------------------------- */
+.toast-container {
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+}
+
+.toast {
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateY(24px) scale(0.96);
+  transition: opacity 280ms cubic-bezier(0.32, 0.72, 0, 1),
+              transform 280ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.toast.is-visible {
+  transform: translateY(0) scale(1);
+}
+
+/* -----------------------------------------------
+   Page Transition — App-Level Motion
+   ----------------------------------------------- */
+.page-transition-out {
+  opacity: 0;
+  transform: translateX(-16px) scale(0.98);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.page-transition-in {
+  opacity: 0;
+  transform: translateX(16px) scale(0.98);
+}
+
+.page-transition-in.is-visible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  transition: opacity 220ms cubic-bezier(0.32, 0.72, 0, 1),
+              transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* -----------------------------------------------
+   Offline Page
+   ----------------------------------------------- */
+.offline-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  text-align: center;
+  gap: 16px;
+}
+
+.offline-page__icon {
+  font-size: 64px;
+  margin-bottom: 8px;
+}
+
+.offline-page__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2933;
+  margin: 0;
+}
+
+.offline-page__desc {
+  font-size: 15px;
+  color: #5d6978;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.offline-page__retry {
+  margin-top: 8px;
+  padding: 12px 24px;
+  background-color: #007aff;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.offline-page__retry:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+/* -----------------------------------------------
+   Dark Mode Overrides
+   ----------------------------------------------- */
+html[data-theme="dark"] .install-banner {
+  background-color: rgba(15, 23, 42, 0.92);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"] .install-banner__text {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .offline-page__title {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .offline-page__desc {
+  color: #94a3b8;
+}

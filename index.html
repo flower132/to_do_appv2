@@ -2,8 +2,18 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Lily Todo App V2</title>
+
+  <!-- PWA Manifest & Theme -->
+  <meta name="theme-color" content="#007aff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Lily Todo">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72x72.svg">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.svg">
+  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.svg">
 
   <!-- base.css：放全局基础样式，例如字体、颜色、盒模型 -->
   <link rel="stylesheet" href="css/base.css">
@@ -16,8 +26,23 @@
 
   <!-- pages.css：放每个页面自己的简单样式 -->
   <link rel="stylesheet" href="css/pages.css">
+
+  <!-- pwa.css：PWA 专属体验层样式 -->
+  <link rel="stylesheet" href="css/pwa.css">
 </head>
-<body>
+<body class="pwa-detecting">
+  <!-- Install Banner：PWA 安装引导 -->
+  <div id="install-banner" class="install-banner" hidden>
+    <span class="install-banner__text" id="install-banner-text">添加到主屏幕，获得更好体验</span>
+    <button class="install-banner__action" id="install-banner-action" type="button" hidden>安装</button>
+    <button class="install-banner__close" id="install-banner-close" type="button" aria-label="关闭">✕</button>
+  </div>
+
+  <!-- Mobile Header：移动端顶部标题栏 -->
+  <header class="mobile-header">
+    <h1 class="mobile-header__title">Todo</h1>
+  </header>
+
   <!-- App Shell：应用的外壳，包含左侧导航栏和右侧主内容区域 -->
   <div class="app-shell">
     <aside class="sidebar">
@@ -39,6 +64,43 @@
     <main class="main-content" id="page-content" tabindex="-1"></main>
   </div>
 
+  <!-- Mobile Bottom Tab Bar：移动端底部导航 -->
+  <nav class="mobile-tab-bar" aria-label="底部导航">
+    <button class="mobile-tab is-active" type="button" data-page="todo">
+      <span class="mobile-tab__label">Todo</span>
+    </button>
+    <button class="mobile-tab" type="button" data-page="calendar">
+      <span class="mobile-tab__label">Calendar</span>
+    </button>
+    <button class="mobile-tab mobile-tab--center" type="button" data-action="quick-add">
+      <span class="mobile-tab__center-icon">＋</span>
+    </button>
+    <button class="mobile-tab" type="button" data-page="history">
+      <span class="mobile-tab__label">History</span>
+    </button>
+    <button class="mobile-tab" type="button" data-page="settings">
+      <span class="mobile-tab__label">Settings</span>
+    </button>
+  </nav>
+
+  <!-- Floating Action Button：移动端浮动操作按钮 -->
+  <button class="fab-button" type="button" aria-label="新增任务">＋</button>
+
+  <!-- Quick Add Panel：移动端快速添加任务面板 -->
+  <div class="quick-add-panel" id="quick-add-panel">
+    <div class="quick-add-panel__backdrop" id="quick-add-backdrop"></div>
+    <div class="quick-add-panel__sheet">
+      <div class="quick-add-panel__header">
+        <span class="quick-add-panel__title">新建任务</span>
+        <button class="quick-add-panel__close" type="button" id="quick-add-close">✕</button>
+      </div>
+      <form class="quick-add-panel__form" id="quick-add-form">
+        <input class="quick-add-panel__input" type="text" name="title" placeholder="输入待办事项" autocomplete="off">
+        <button class="quick-add-panel__submit" type="submit">添加</button>
+      </form>
+    </div>
+  </div>
+
   <!-- data.js：负责 Todo 数据和本地持久化 -->
   <script src="js/data.js"></script>
 
@@ -56,5 +118,25 @@
 
   <!-- Toast 容器 -->
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- PWA 状态检测与动态主题色 -->
+  <script>
+    (function() {
+      var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      document.body.classList.toggle('pwa-standalone', isStandalone);
+      document.body.classList.remove('pwa-detecting');
+
+      var theme = document.documentElement.dataset.theme || 'light';
+      var metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.content = theme === 'dark' ? '#0f172a' : '#007aff';
+    })();
+  </script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
 </body>
 </html>

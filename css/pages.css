@@ -670,7 +670,20 @@
   background-color: #d1242f;
 }
 
-@media (max-width: 640px) {
+/* ================================
+   Mobile Layout (max-width: 768px)
+   ================================ */
+
+@media (max-width: 768px) {
+  .page-panel {
+    max-width: none;
+    padding: 16px;
+  }
+
+  .page-header h2 {
+    font-size: 22px;
+  }
+
   .todo-form__row,
   .todo-form__grid,
   .todo-quadrants {
@@ -679,6 +692,53 @@
 
   .todo-form__row {
     display: grid;
+  }
+
+  /* Larger touch targets */
+  .todo-item__checkbox {
+    width: 24px;
+    height: 24px;
+    margin-top: 0;
+  }
+
+  .todo-item__select,
+  .history-item__select,
+  .calendar-selected-panel__select {
+    width: 24px;
+    height: 24px;
+    margin-top: 0;
+  }
+
+  .todo-item,
+  .history-item,
+  .calendar-cell,
+  .calendar-selected-panel__item {
+    padding: 16px;
+  }
+
+  .todo-item__delete,
+  .history-item__restore,
+  .history-item__delete,
+  .calendar-selected-panel__complete,
+  .calendar-selected-panel__delete {
+    min-height: 40px;
+    padding: 8px 16px;
+  }
+
+  .todo-form__input,
+  .todo-form__select,
+  .todo-form__textarea,
+  .todo-controls__select,
+  .settings-select {
+    min-height: 44px;
+    padding: 12px 14px;
+  }
+
+  .todo-form__button,
+  .settings-button,
+  .calendar-nav__button {
+    min-height: 44px;
+    padding: 10px 16px;
   }
 
   .calendar-widget {
@@ -725,6 +785,30 @@
 
   .calendar-selected-panel__item {
     padding: 10px;
+  }
+
+  /* Touch feedback instead of hover on mobile */
+  @media (hover: none) {
+    .nav-button:hover,
+    .todo-form__button:hover,
+    .settings-button:hover,
+    .calendar-nav__button:hover,
+    .todo-item__delete:hover,
+    .history-item__delete:hover,
+    .calendar-selected-panel__delete:hover,
+    .history-item__restore:hover,
+    .calendar-selected-panel__complete:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .todo-item:active,
+    .history-item:active,
+    .calendar-cell:active,
+    .calendar-selected-panel__item:active {
+      transform: scale(0.995);
+      transition: transform 80ms ease;
+    }
   }
 }
 

@@ -6,6 +6,7 @@
 
 const pageContent = document.querySelector("#page-content");
 const navButtons = document.querySelectorAll(".nav-button");
+let currentPageName = "";
 
 /*
   renderPage：根据页面名称渲染主内容区域。
@@ -16,6 +17,9 @@ function renderPage(pageName) {
   if (page === undefined) {
     return;
   }
+
+  currentPageName = pageName;
+  updateMobileHeader(pageName);
 
   if (pageName === "todo") {
     todoPage.render();
@@ -47,6 +51,33 @@ function renderPage(pageName) {
 }
 
 /*
+  navigateToPage：带轻量动画的页面切换，用于移动端导航。
+*/
+function navigateToPage(pageName) {
+  if (pageName === currentPageName) {
+    return;
+  }
+
+  if (window.innerWidth > 768) {
+    renderPage(pageName);
+    return;
+  }
+
+  pageContent.classList.add("page-transition-out");
+  setTimeout(function () {
+    renderPage(pageName);
+    pageContent.classList.remove("page-transition-out");
+    pageContent.classList.add("page-transition-in");
+    requestAnimationFrame(function () {
+      pageContent.classList.add("is-visible");
+      setTimeout(function () {
+        pageContent.classList.remove("page-transition-in", "is-visible");
+      }, 150);
+    });
+  }, 150);
+}
+
+/*
   createPageHtml：创建非 Todo 页面的占位内容 HTML。
 */
 function createPageHtml(page) {
@@ -70,12 +101,28 @@ function createPageHtml(page) {
 }
 
 /*
-  updateActiveNavButton：更新左侧导航按钮的选中状态。
+  updateActiveNavButton：更新左侧导航按钮和底部 Tab 的选中状态。
 */
 function updateActiveNavButton(pageName) {
   for (const button of navButtons) {
     const isCurrentPage = button.dataset.page === pageName;
     button.classList.toggle("is-active", isCurrentPage);
+  }
+
+  const mobileTabs = document.querySelectorAll(".mobile-tab[data-page]");
+  for (const tab of mobileTabs) {
+    const isCurrentPage = tab.dataset.page === pageName;
+    tab.classList.toggle("is-active", isCurrentPage);
+  }
+}
+
+/*
+  updateMobileHeader：更新移动端顶部标题栏的页面标题。
+*/
+function updateMobileHeader(pageName) {
+  const titleEl = document.querySelector(".mobile-header__title");
+  if (titleEl && pages[pageName]) {
+    titleEl.textContent = pages[pageName].title;
   }
 }
 
