@@ -72,9 +72,9 @@ function navigateToPage(pageName) {
       pageContent.classList.add("is-visible");
       setTimeout(function () {
         pageContent.classList.remove("page-transition-in", "is-visible");
-      }, 150);
+      }, 220);
     });
-  }, 150);
+  }, 180);
 }
 
 /*
