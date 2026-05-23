@@ -16,8 +16,8 @@
   width: 240px;
   flex-shrink: 0;
   padding: var(--space-5) var(--space-4);
-  color: #ffffff;
-  background-color: #1c1c1e;
+  color: var(--sidebar-text);
+  background-color: var(--sidebar-bg);
   backdrop-filter: var(--blur-backdrop);
   -webkit-backdrop-filter: var(--blur-backdrop);
   border-right: var(--border-width) solid var(--border-color);

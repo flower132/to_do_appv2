@@ -27,14 +27,18 @@ const defaultSettings = {
 
 const i18n = {
   "zh-CN": {
-    "page.todo": "Todo",
+    "page.todo": "待办",
     "page.todo.desc": "管理当前待办事项。",
-    "page.calendar": "Calendar",
+    "page.calendar": "日历",
     "page.calendar.desc": "按截止日期查看 Todo。",
-    "page.history": "History",
+    "page.history": "历史",
     "page.history.desc": "查看已经完成的 Todo。",
-    "page.settings": "Settings",
+    "page.settings": "设置",
     "page.settings.desc": "管理应用偏好设置。",
+    "install.banner.default": "添加到主屏幕，获得更好体验",
+    "install.banner.ios": "点击分享按钮并选择\"添加到主屏幕\"",
+    "install.banner.android": "添加到主屏幕，像 App 一样使用",
+    "install.banner.hint": "请使用浏览器菜单将本页添加到主屏幕",
     "settings.appearance": "外观设置",
     "settings.theme": "主题",
     "settings.theme.light": "浅色",
@@ -125,6 +129,10 @@ const i18n = {
     "page.history.desc": "View completed tasks.",
     "page.settings": "Settings",
     "page.settings.desc": "Manage app preferences.",
+    "install.banner.default": "Add to home screen for a better experience",
+    "install.banner.ios": "Tap the share button and select \"Add to Home Screen\"",
+    "install.banner.android": "Add to home screen to use like an app",
+    "install.banner.hint": "Please use the browser menu to add this page to your home screen",
     "settings.appearance": "Appearance",
     "settings.theme": "Theme",
     "settings.theme.light": "Light",
@@ -274,11 +282,27 @@ function getEffectiveTheme() {
 */
 function applySettingsToDOM() {
   const html = document.documentElement;
-  html.dataset.theme = getEffectiveTheme();
+  const theme = getEffectiveTheme();
+  html.dataset.theme = theme;
   html.dataset.fontSize = settings.appearance.fontSize;
   html.dataset.compact = String(settings.appearance.compactMode);
   html.dataset.locale = settings.language.locale;
   html.dataset.themeStyle = settings.appearance.themeStyle || "apple";
+
+  if (theme === "dark") {
+    html.style.setProperty("--sidebar-bg", "#1c1c1e");
+    html.style.setProperty("--sidebar-text", "#ffffff");
+    html.style.setProperty("--sidebar-hover-bg", "rgba(255, 255, 255, 0.06)");
+  } else {
+    html.style.setProperty("--sidebar-bg", "#f2f2f7");
+    html.style.setProperty("--sidebar-text", "#000000");
+    html.style.setProperty("--sidebar-hover-bg", "rgba(0, 0, 0, 0.04)");
+  }
+
+  var metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.content = theme === 'dark' ? '#0f172a' : '#007aff';
+  }
 }
 
 /*

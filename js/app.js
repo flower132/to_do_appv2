@@ -4,11 +4,92 @@
   页面加载完成后，从这里启动 App Shell。
 */
 
+const appQuotes = [
+  "Stay hungry, stay foolish.",
+  "Less, but better.",
+  "Focus on what matters.",
+  "Simplicity is the ultimate sophistication.",
+  "Done is better than perfect.",
+  "The only way to do great work is to love what you do.",
+  "Think different.",
+  "Design is not just what it looks like and feels like. Design is how it works.",
+  "It always seems impossible until it's done.",
+  "Quality is not an act, it is a habit."
+];
+
+function getDailyQuote() {
+  var now = new Date();
+  var seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+  return appQuotes[seed % appQuotes.length];
+}
+
+function updateAppShellQuote() {
+  var el = document.getElementById("app-shell-quote");
+  if (el) {
+    el.textContent = getDailyQuote();
+  }
+}
+
+function updateStaticLabels() {
+  document.querySelectorAll(".nav-button[data-page]").forEach(function (btn) {
+    btn.textContent = t("page." + btn.dataset.page);
+  });
+
+  document.querySelectorAll(".mobile-tab[data-page] .mobile-tab__label").forEach(function (label) {
+    var page = label.closest(".mobile-tab").dataset.page;
+    label.textContent = t("page." + page);
+  });
+
+  var quickAddTitle = document.querySelector(".quick-add-panel__title");
+  if (quickAddTitle) {
+    quickAddTitle.textContent = t("todo.new");
+  }
+
+  var quickAddInput = document.querySelector(".quick-add-panel__input");
+  if (quickAddInput) {
+    quickAddInput.placeholder = t("todo.placeholder");
+  }
+
+  var quickAddSubmit = document.querySelector(".quick-add-panel__submit");
+  if (quickAddSubmit) {
+    quickAddSubmit.textContent = t("todo.add");
+  }
+
+  var fab = document.querySelector(".fab-button");
+  if (fab) {
+    fab.setAttribute("aria-label", t("todo.new"));
+  }
+
+  if (currentPageName) {
+    updateMobileHeader(currentPageName);
+  }
+
+  updateInstallBannerText();
+  updateAppShellQuote();
+}
+
+function updateInstallBannerText() {
+  var bannerText = document.getElementById("install-banner-text");
+  if (!bannerText) return;
+
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var isAndroid = /Android/.test(navigator.userAgent);
+
+  var text = t("install.banner.default");
+  if (isIOS) {
+    text = t("install.banner.ios");
+  } else if (isAndroid) {
+    text = t("install.banner.android");
+  }
+  bannerText.textContent = text;
+}
+
 /*
   startApp：加载设置、应用到 DOM、初始化导航，并渲染默认页面。
 */
 function startApp() {
   applySettingsToDOM();
+  updateStaticLabels();
   setupNavigation();
   setupSystemThemeListener();
   setupMobileNavigation();
@@ -16,7 +97,6 @@ function startApp() {
   setupQuickAdd();
   setupButtonPressFeedback();
   initPWA();
-  updateThemeColor();
   navigateToPage(getSettings().behavior.defaultPage);
 }
 
@@ -30,7 +110,7 @@ function setupSystemThemeListener() {
   }
   media.addEventListener("change", function () {
     if (getSettings().appearance.theme === "system") {
-      document.documentElement.dataset.theme = getEffectiveTheme();
+      applySettingsToDOM();
     }
   });
 }
@@ -254,11 +334,11 @@ function initPWA() {
   var isAndroid = /Android/.test(navigator.userAgent);
   var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-  var text = '添加到主屏幕，获得更好体验';
+  var text = t('install.banner.default');
   if (isIOS) {
-    text = '点击分享按钮并选择"添加到主屏幕"';
+    text = t('install.banner.ios');
   } else if (isAndroid) {
-    text = '添加到主屏幕，像 App 一样使用';
+    text = t('install.banner.android');
   }
   bannerText.textContent = text;
 
@@ -295,9 +375,9 @@ function initPWA() {
         }, 400);
       });
     } else if (isIOS && isSafari) {
-      showToast('请点击 Safari 底部分享按钮，选择"添加到主屏幕"', 'info');
+      showToast(t('install.banner.ios'), 'info');
     } else {
-      showToast('请使用浏览器菜单将本页添加到主屏幕', 'info');
+      showToast(t('install.banner.hint'), 'info');
     }
   });
 }

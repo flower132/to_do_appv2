@@ -121,8 +121,8 @@ function updateActiveNavButton(pageName) {
 */
 function updateMobileHeader(pageName) {
   const titleEl = document.querySelector(".mobile-header__title");
-  if (titleEl && pages[pageName]) {
-    titleEl.textContent = pages[pageName].title;
+  if (titleEl) {
+    titleEl.textContent = t("page." + pageName);
   }
 }
 

@@ -1408,7 +1408,13 @@ const settingsPage = (function () {
     }
 
     if (path.indexOf("language.locale") === 0) {
-      renderSettingsPage();
+      applySettingsToDOM();
+      updateStaticLabels();
+      if (currentPageName !== "settings") {
+        renderPage(currentPageName);
+      } else {
+        renderSettingsPage();
+      }
     }
   }
 
