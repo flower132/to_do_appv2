@@ -3,3 +3,4 @@ playwright
 *.png
 *.mjs
 .DS_Store
+node_modules/
