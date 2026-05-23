@@ -163,8 +163,13 @@ html[data-theme="dark"] .toast {
 /* ================================================
    Mobile Header
    ================================================ */
+@media (min-width: 769px) {
+  .mobile-header {
+    display: none;
+  }
+}
+
 .mobile-header {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -200,8 +205,13 @@ html[data-theme="dark"] .mobile-header__title {
 /* ================================================
    Mobile Bottom Tab Bar
    ================================================ */
+@media (min-width: 769px) {
+  .mobile-tab-bar {
+    display: none;
+  }
+}
+
 .mobile-tab-bar {
-  display: none;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -330,8 +340,13 @@ html[data-theme="dark"] .mobile-tab.is-active {
 /* ================================================
    Floating Action Button
    ================================================ */
+@media (min-width: 769px) {
+  .fab-button {
+    display: none;
+  }
+}
+
 .fab-button {
-  display: none;
   position: fixed;
   right: 20px;
   bottom: calc(84px + env(safe-area-inset-bottom, 0px));
