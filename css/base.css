@@ -187,3 +187,91 @@ h3,
 p {
   margin-top: 0;
 }
+
+/* ================================
+   themeStyle: apple / todoist / minimal
+   ================================ */
+
+/* todoist */
+html[data-theme-style="todoist"] .page-panel {
+  border-radius: 12px;
+}
+
+html[data-theme-style="todoist"] .todo-quadrant-panel,
+html[data-theme-style="todoist"] .todo-item,
+html[data-theme-style="todoist"] .history-item,
+html[data-theme-style="todoist"] .calendar-cell,
+html[data-theme-style="todoist"] .calendar-selected-panel,
+html[data-theme-style="todoist"] .settings-card {
+  border-radius: 10px;
+}
+
+html[data-theme-style="todoist"] .empty-state__icon {
+  font-size: 48px;
+}
+
+html[data-theme-style="todoist"] .nav-button:hover,
+html[data-theme-style="todoist"] .todo-form__button:hover,
+html[data-theme-style="todoist"] .settings-button:hover,
+html[data-theme-style="todoist"] .calendar-nav__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme-style="todoist"] .todo-item__delete:hover,
+html[data-theme-style="todoist"] .history-item__delete:hover,
+html[data-theme-style="todoist"] .calendar-selected-panel__delete:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(209, 36, 47, 0.18);
+}
+
+/* minimal */
+html[data-theme-style="minimal"] .page-panel {
+  box-shadow: none;
+  border-radius: 4px;
+  border-color: #eef2f6;
+}
+
+html[data-theme-style="minimal"] .todo-quadrant-panel,
+html[data-theme-style="minimal"] .todo-item,
+html[data-theme-style="minimal"] .history-item,
+html[data-theme-style="minimal"] .calendar-cell,
+html[data-theme-style="minimal"] .calendar-selected-panel,
+html[data-theme-style="minimal"] .settings-card {
+  box-shadow: none;
+  border-radius: 4px;
+  border-color: #eef2f6;
+}
+
+html[data-theme-style="minimal"] .nav-button:hover,
+html[data-theme-style="minimal"] .todo-form__button:hover,
+html[data-theme-style="minimal"] .settings-button:hover,
+html[data-theme-style="minimal"] .calendar-nav__button:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+html[data-theme-style="minimal"] .calendar-nav__button {
+  box-shadow: none;
+}
+
+html[data-theme-style="minimal"] .calendar-cell:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+html[data-theme-style="minimal"] .empty-state__icon {
+  font-size: 32px;
+  opacity: 0.7;
+}
+
+/* Dark mode themeStyle overrides */
+html[data-theme="dark"][data-theme-style="minimal"] .page-panel,
+html[data-theme="dark"][data-theme-style="minimal"] .todo-quadrant-panel,
+html[data-theme="dark"][data-theme-style="minimal"] .todo-item,
+html[data-theme="dark"][data-theme-style="minimal"] .history-item,
+html[data-theme="dark"][data-theme-style="minimal"] .calendar-cell,
+html[data-theme="dark"][data-theme-style="minimal"] .calendar-selected-panel,
+html[data-theme="dark"][data-theme-style="minimal"] .settings-card {
+  border-color: #334155;
+}

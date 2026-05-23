@@ -55,6 +55,16 @@ function escapePageHtml(text) {
     .replaceAll("'", "&#039;");
 }
 
+function createEmptyStateHtml(icon, title, subtitle) {
+  return (
+    '<div class="empty-state">' +
+      '<div class="empty-state__icon">' + escapePageHtml(icon) + "</div>" +
+      '<div class="empty-state__title">' + escapePageHtml(title) + "</div>" +
+      '<div class="empty-state__subtitle">' + escapePageHtml(subtitle) + "</div>" +
+    "</div>"
+  );
+}
+
 const calendarPage = (function () {
   const calendarState = {
     year: new Date().getFullYear(),
@@ -86,6 +96,8 @@ const calendarPage = (function () {
     createCalendarPageHtml：创建 Calendar 页面完整 HTML 字符串。
   */
   function createCalendarPageHtml() {
+    var hasAnyActive = getActiveTodos().length > 0;
+
     return (
       '<section class="page-panel">' +
         '<header class="page-header">' +
@@ -93,7 +105,7 @@ const calendarPage = (function () {
           "<p>" + t("page.calendar.desc") + "</p>" +
         "</header>" +
         createCalendarWidgetHtml() +
-        createSelectedDatePanelHtml() +
+        (hasAnyActive ? createSelectedDatePanelHtml() : createEmptyStateHtml("📅", t("calendar.emptyTitle"), t("calendar.emptySubtitle"))) +
       "</section>"
     );
   }
@@ -348,12 +360,14 @@ const calendarPage = (function () {
 
     if (action === "complete" && id !== undefined) {
       toggleTodo(id);
+      showToast(t("toast.completed"), "success");
       renderCalendarPage();
       return;
     }
 
     if (action === "delete" && id !== undefined) {
       deleteTodo(id);
+      showToast(t("toast.deleted"), "delete");
       renderCalendarPage();
       return;
     }
@@ -381,19 +395,23 @@ const calendarPage = (function () {
     }
 
     if (action === "bulk-complete") {
+      var calCompletedCount = calendarViewState.selectedTodos.length;
       calendarViewState.selectedTodos.forEach(function (todoId) {
         toggleTodo(todoId);
       });
       calendarViewState.selectedTodos = [];
+      showToast(t("toast.completed"), "success");
       renderCalendarPage();
       return;
     }
 
     if (action === "bulk-delete") {
+      var calDeletedCount = calendarViewState.selectedTodos.length;
       calendarViewState.selectedTodos.forEach(function (todoId) {
         deleteTodo(todoId);
       });
       calendarViewState.selectedTodos = [];
+      showToast(t("toast.deletedN").replace("{n}", String(calDeletedCount)), "delete");
       renderCalendarPage();
       return;
     }
@@ -610,7 +628,7 @@ const todoPage = (function () {
   */
   function createTodoListHtml(todos) {
     if (todos.length === 0) {
-      return '<p class="todo-empty">' + t("todo.empty") + '</p>';
+      return createEmptyStateHtml("📭", t("todo.emptyTitle"), t("todo.emptySubtitle"));
     }
 
     return '<ul class="todo-list">' + createTodoItemsHtml(todos) + "</ul>";
@@ -793,6 +811,7 @@ const todoPage = (function () {
       dueDate: form.elements.dueDate.value,
       note: form.elements.note.value.trim()
     });
+    showToast(t("toast.addedToToday"), "success");
     renderTodoPage();
   }
 
@@ -828,8 +847,15 @@ const todoPage = (function () {
     var id = event.target.dataset.id;
 
     if (action === "toggle" && id !== undefined) {
-      toggleTodo(id);
-      renderTodoPage();
+      var item = event.target.closest(".todo-item");
+      if (item !== null) {
+        item.classList.add("is-completing");
+      }
+      setTimeout(function () {
+        toggleTodo(id);
+        showToast(t("toast.completed"), "success");
+        renderTodoPage();
+      }, 200);
       return;
     }
 
@@ -854,8 +880,20 @@ const todoPage = (function () {
       return;
     }
 
-    deleteTodo(event.target.dataset.id);
-    renderTodoPage();
+    var id = event.target.dataset.id;
+    var item = event.target.closest(".todo-item");
+    if (item !== null) {
+      item.classList.add("is-deleting");
+      setTimeout(function () {
+        deleteTodo(id);
+        showToast(t("toast.deleted"), "delete");
+        renderTodoPage();
+      }, 250);
+    } else {
+      deleteTodo(id);
+      showToast(t("toast.deleted"), "delete");
+      renderTodoPage();
+    }
   }
 
   /*
@@ -888,19 +926,23 @@ const todoPage = (function () {
     }
 
     if (action === "bulk-complete") {
+      var completedCount = viewState.selectedTodos.length;
       viewState.selectedTodos.forEach(function (todoId) {
         toggleTodo(todoId);
       });
       viewState.selectedTodos = [];
+      showToast(t("toast.completed"), "success");
       renderTodoPage();
       return;
     }
 
     if (action === "bulk-delete") {
+      var deletedCount = viewState.selectedTodos.length;
       viewState.selectedTodos.forEach(function (todoId) {
         deleteTodo(todoId);
       });
       viewState.selectedTodos = [];
+      showToast(t("toast.deletedN").replace("{n}", String(deletedCount)), "delete");
       renderTodoPage();
       return;
     }
@@ -1003,7 +1045,7 @@ const historyPage = (function () {
     if (completedTodos.length === 0) {
       return (
         '<div class="history-page">' +
-          '<p class="history-empty">' + t("todo.noHistory") + '</p>' +
+          createEmptyStateHtml("🕰️", t("history.emptyTitle"), t("history.emptySubtitle")) +
         "</div>"
       );
     }
@@ -1093,13 +1135,25 @@ const historyPage = (function () {
 
     if (action === "restore" && id !== undefined) {
       restoreTodo(id);
+      showToast(t("toast.restored"), "info");
       renderHistoryPage();
       return;
     }
 
     if (action === "delete" && id !== undefined) {
-      deleteTodo(id);
-      renderHistoryPage();
+      var histItem = event.target.closest(".history-item");
+      if (histItem !== null) {
+        histItem.classList.add("is-deleting");
+        setTimeout(function () {
+          deleteTodo(id);
+          showToast(t("toast.deleted"), "delete");
+          renderHistoryPage();
+        }, 250);
+      } else {
+        deleteTodo(id);
+        showToast(t("toast.deleted"), "delete");
+        renderHistoryPage();
+      }
       return;
     }
   }
@@ -1148,10 +1202,12 @@ const historyPage = (function () {
     }
 
     if (action === "bulk-delete") {
+      var histDeletedCount = historyViewState.selectedTodos.length;
       historyViewState.selectedTodos.forEach(function (todoId) {
         deleteTodo(todoId);
       });
       historyViewState.selectedTodos = [];
+      showToast(t("toast.deletedN").replace("{n}", String(histDeletedCount)), "delete");
       renderHistoryPage();
       return;
     }
@@ -1198,6 +1254,11 @@ const settingsPage = (function () {
       { value: "dark", label: t("settings.theme.dark") },
       { value: "system", label: t("settings.theme.system") }
     ];
+    var themeStyleOptions = [
+      { value: "apple", label: t("settings.themeStyle.apple") },
+      { value: "todoist", label: t("settings.themeStyle.todoist") },
+      { value: "minimal", label: t("settings.themeStyle.minimal") }
+    ];
     var fontSizeOptions = [
       { value: "small", label: t("settings.fontSize.small") },
       { value: "medium", label: t("settings.fontSize.medium") },
@@ -1209,6 +1270,7 @@ const settingsPage = (function () {
         '<h3 class="settings-section__title">' + t("settings.appearance") + "</h3>" +
         '<div class="settings-card">' +
           createSettingsRowSelectHtml(t("settings.theme"), "appearance.theme", themeOptions, s.appearance.theme) +
+          createSettingsRowSelectHtml(t("settings.themeStyle"), "appearance.themeStyle", themeStyleOptions, s.appearance.themeStyle) +
           createSettingsRowSelectHtml(t("settings.fontSize"), "appearance.fontSize", fontSizeOptions, s.appearance.fontSize) +
           createSettingsRowSwitchHtml(t("settings.compactMode"), "appearance.compactMode", s.appearance.compactMode) +
         "</div>" +
@@ -1347,6 +1409,7 @@ const settingsPage = (function () {
 
     if (action === "export") {
       exportData();
+      showToast(t("toast.exported"), "info");
       return;
     }
 
@@ -1365,9 +1428,9 @@ const settingsPage = (function () {
     reader.onload = function (e) {
       var success = importData(e.target.result);
       if (success) {
-        window.alert("Import successful.");
+        showToast(t("toast.importSuccess"), "success");
       } else {
-        window.alert("Import failed. Please check the file format.");
+        showToast(t("toast.importFailed"), "warning");
       }
       event.currentTarget.value = "";
     };

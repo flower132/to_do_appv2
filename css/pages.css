@@ -941,3 +941,69 @@ html[data-theme="dark"] .settings-row__label {
 html[data-theme="dark"] .settings-section__title {
   color: #94a3b8;
 }
+
+/* Micro Animations */
+.todo-item__checkbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.todo-item__checkbox:checked {
+  transform: scale(1.15);
+  opacity: 0.8;
+}
+
+.todo-item.is-completing {
+  transform: scale(0.98);
+  opacity: 0.6;
+  transition: transform 200ms ease, opacity 200ms ease;
+}
+
+.todo-item.is-deleting,
+.history-item.is-deleting,
+.calendar-selected-panel__item.is-deleting {
+  opacity: 0;
+  max-height: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-width: 0;
+  overflow: hidden;
+  transition: opacity 200ms ease, max-height 250ms ease, padding 250ms ease, margin 250ms ease, border-width 250ms ease;
+}
+
+/* Button hover micro-interactions */
+.nav-button,
+.todo-form__button,
+.todo-item__delete,
+.settings-button,
+.calendar-nav__button,
+.calendar-selected-panel__complete,
+.calendar-selected-panel__delete,
+.history-item__restore,
+.history-item__delete,
+.todo-bulk-actions__button,
+.calendar-bulk-actions__button,
+.history-bulk-actions__button {
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.nav-button:hover,
+.todo-form__button:hover,
+.settings-button:hover,
+.calendar-nav__button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Dark mode overrides for empty state */
+html[data-theme="dark"] .empty-state__title {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .empty-state__subtitle {
+  color: #94a3b8;
+}

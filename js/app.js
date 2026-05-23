@@ -29,4 +29,53 @@ function setupSystemThemeListener() {
   });
 }
 
+/*
+  Toast 系统
+  showToast(message, type)：在屏幕底部居中显示一条非阻塞 Toast。
+  type: success | info | warning | delete
+*/
+function showToast(message, type) {
+  var container = document.getElementById("toast-container");
+  if (container === null) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    container.className = "toast-container";
+    container.setAttribute("aria-live", "polite");
+    document.body.appendChild(container);
+  }
+
+  var icons = {
+    success: "✔",
+    info: "📌",
+    warning: "⚠",
+    delete: "🗑"
+  };
+
+  var toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = (icons[type] || icons.info) + " " + message;
+
+  while (container.children.length >= 3) {
+    container.removeChild(container.firstChild);
+  }
+
+  container.appendChild(toast);
+
+  // 强制回流以触发 transition
+  toast.offsetHeight;
+
+  requestAnimationFrame(function () {
+    toast.classList.add("is-visible");
+  });
+
+  setTimeout(function () {
+    toast.classList.remove("is-visible");
+    setTimeout(function () {
+      if (toast.parentNode !== null) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }, 2000);
+}
+
 startApp();

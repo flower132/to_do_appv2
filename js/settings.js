@@ -10,7 +10,8 @@ const defaultSettings = {
   appearance: {
     theme: "light",
     fontSize: "medium",
-    compactMode: false
+    compactMode: false,
+    themeStyle: "apple"
   },
   language: {
     locale: "zh-CN"
@@ -39,6 +40,10 @@ const i18n = {
     "settings.theme.light": "浅色",
     "settings.theme.dark": "深色",
     "settings.theme.system": "跟随系统",
+    "settings.themeStyle": "界面风格",
+    "settings.themeStyle.apple": "Apple",
+    "settings.themeStyle.todoist": "Todoist",
+    "settings.themeStyle.minimal": "Minimal",
     "settings.fontSize": "字体大小",
     "settings.fontSize.small": "小",
     "settings.fontSize.medium": "中",
@@ -74,6 +79,21 @@ const i18n = {
     "todo.search.placeholder": "搜索 Todo",
     "todo.quadrant.all": "全部",
     "todo.empty": "暂无 Todo。",
+    "todo.emptyTitle": "没有待办任务",
+    "todo.emptySubtitle": "开始创建你的第一个任务",
+    "history.emptyTitle": "还没有完成记录",
+    "history.emptySubtitle": "完成任务后会出现在这里",
+    "calendar.emptyTitle": "今天没有安排",
+    "calendar.emptySubtitle": "享受你的空闲时间",
+    "toast.completed": "已完成任务",
+    "toast.deleted": "已删除任务",
+    "toast.deletedN": "已删除 {n} 个任务",
+    "toast.restored": "已恢复任务",
+    "toast.addedToToday": "已添加到今日",
+    "toast.exported": "导出成功",
+    "toast.importSuccess": "导入成功",
+    "toast.importFailed": "导入失败，请检查文件格式",
+    "toast.cleared": "已清空所有数据",
     "todo.selectAll": "全选",
     "todo.deselectAll": "取消全选",
     "todo.bulkComplete": "批量完成",
@@ -110,6 +130,10 @@ const i18n = {
     "settings.theme.light": "Light",
     "settings.theme.dark": "Dark",
     "settings.theme.system": "System",
+    "settings.themeStyle": "Style",
+    "settings.themeStyle.apple": "Apple",
+    "settings.themeStyle.todoist": "Todoist",
+    "settings.themeStyle.minimal": "Minimal",
     "settings.fontSize": "Font Size",
     "settings.fontSize.small": "Small",
     "settings.fontSize.medium": "Medium",
@@ -145,6 +169,21 @@ const i18n = {
     "todo.search.placeholder": "Search tasks",
     "todo.quadrant.all": "All",
     "todo.empty": "No tasks yet.",
+    "todo.emptyTitle": "No tasks yet",
+    "todo.emptySubtitle": "Create your first task to get started",
+    "history.emptyTitle": "No completed tasks yet",
+    "history.emptySubtitle": "Completed tasks will appear here",
+    "calendar.emptyTitle": "Nothing scheduled today",
+    "calendar.emptySubtitle": "Enjoy your free time",
+    "toast.completed": "Task completed",
+    "toast.deleted": "Task deleted",
+    "toast.deletedN": "Deleted {n} tasks",
+    "toast.restored": "Task restored",
+    "toast.addedToToday": "Added to today",
+    "toast.exported": "Export successful",
+    "toast.importSuccess": "Import successful",
+    "toast.importFailed": "Import failed. Please check the file format",
+    "toast.cleared": "All data cleared",
     "todo.selectAll": "Select All",
     "todo.deselectAll": "Deselect All",
     "todo.bulkComplete": "Bulk Complete",
@@ -239,6 +278,7 @@ function applySettingsToDOM() {
   html.dataset.fontSize = settings.appearance.fontSize;
   html.dataset.compact = String(settings.appearance.compactMode);
   html.dataset.locale = settings.language.locale;
+  html.dataset.themeStyle = settings.appearance.themeStyle || "apple";
 }
 
 /*
